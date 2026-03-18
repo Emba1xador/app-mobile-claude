@@ -1,0 +1,210 @@
+{
+  "version": 1,
+  "blocks": [
+    {
+      "block_id": "3594af7f745943468fb12100b2acbeb4",
+      "number": "452",
+      "pages": [
+        {
+          "page_id": "f9dfea3c62f243dc95fcdc8b2d98c563",
+          "number": 1,
+          "lines": [
+            {
+              "line_id": "36458533d89e4638abd7f44bded5fd64",
+              "raw_text": "",
+              "spec": null,
+              "value": null
+            }
+          ]
+        }
+      ],
+      "money_received": null,
+      "whatsapp_phone": null,
+      "money_locked": false
+    },
+    {
+      "block_id": "f230e1151e2d48358c29629dca1a9850",
+      "number": "453",
+      "pages": [
+        {
+          "page_id": "71acd3d95b76466380655598eece3cc6",
+          "number": 1,
+          "lines": [
+            {
+              "line_id": "721dca0fbe0141a7a47d32e1c31fc114",
+              "raw_text": "",
+              "spec": null,
+              "value": null
+            }
+          ]
+        }
+      ],
+      "money_received": null,
+      "whatsapp_phone": null,
+      "money_locked": false
+    },
+    {
+      "block_id": "88ade66df19f40a4b5a530101e64150a",
+      "number": "454",
+      "pages": [
+        {
+          "page_id": "bac3a61dc43847aebf5604b259c2e11a",
+          "number": 1,
+          "lines": [
+            {
+              "line_id": "697818f0e4144b3fa05472cf8dee0637",
+              "raw_text": "",
+              "spec": null,
+              "value": null
+            }
+          ]
+        }
+      ],
+      "money_received": null,
+      "whatsapp_phone": null,
+      "money_locked": false
+    },
+    {
+      "block_id": "2cc5c83471ca4bcdb199da5f8e686dbc",
+      "number": "455",
+      "pages": [
+        {
+          "page_id": "17cac62017c5454091bbee425dde7329",
+          "number": 1,
+          "lines": [
+            {
+              "line_id": "cf9e5c01947842e4865b4fbbe3a2e424",
+              "raw_text": "",
+              "spec": null,
+              "value": null
+            }
+          ]
+        }
+      ],
+      "money_received": null,
+      "whatsapp_phone": null,
+      "money_locked": false
+    },
+    {
+      "block_id": "b985d6cf6486408793a5953a283c0474",
+      "number": "456",
+      "pages": [
+        {
+          "page_id": "43993dfbbfa44ea1b46bb6d730d4f86d",
+          "number": 1,
+          "lines": [
+            {
+              "line_id": "cf3d05d29c0146aa9c2dd2ab37e35b32",
+              "raw_text": "",
+              "spec": null,
+              "value": null
+            }
+          ]
+        }
+      ],
+      "money_received": null,
+      "whatsapp_phone": null,
+      "money_locked": false
+    },
+    {
+      "block_id": "1947f46f618e4449a32c3ac34dc84208",
+      "number": "457",
+      "pages": [
+        {
+          "page_id": "1c97082a09ec4369b7320ff4c05f0c0a",
+          "number": 1,
+          "lines": [
+            {
+              "line_id": "dd22f780ff744035917f6c06a2740832",
+              "raw_text": "",
+              "spec": null,
+              "value": null
+            }
+          ]
+        }
+      ],
+      "money_received": null,
+      "whatsapp_phone": null,
+      "money_locked": false
+    },
+    {
+      "block_id": "97d5de7df814498893c5f8bd3097615f",
+      "number": "458",
+      "pages": [
+        {
+          "page_id": "e06561adc51e4b2e944f6ec77027d7dc",
+          "number": 1,
+          "lines": [
+            {
+              "line_id": "c1b37edf5cf543b6a8efb2df047872e3",
+              "raw_text": "",
+              "spec": null,
+              "value": null
+            }
+          ]
+        }
+      ],
+      "money_received": null,
+      "whatsapp_phone": null,
+      "money_locked": false
+    },
+    {
+      "block_id": "c2e51cc43c254775922a9e0aaae5cc7b",
+      "number": "459",
+      "pages": [
+        {
+          "page_id": "86450fa880ef4287baf87e64a873550d",
+          "number": 1,
+          "lines": [
+            {
+              "line_id": "d65a662e6c674689bac1dffb7f341ea1",
+              "raw_text": "",
+              "spec": null,
+              "value": null
+            }
+          ]
+        }
+      ],
+      "money_received": null,
+      "whatsapp_phone": null,
+      "money_locked": false
+    },
+    {
+      "block_id": "fa4bff8f91154d0c81100989b1671301",
+      "number": "986",
+      "pages": [
+        {
+          "page_id": "c11489dd871847b9bcce359200df50da",
+          "number": 1,
+          "lines": [
+            {
+              "line_id": "9a8b025635cc4476b6d4e6373fca2df5",
+              "raw_text": "",
+              "spec": null,
+              "value": null
+            }
+          ]
+        }
+      ],
+      "money_received": null,
+      "whatsapp_phone": null,
+      "money_locked": false
+    }
+  ],
+  "result": null,
+  "percentage": "0.70",
+  "session_name": "",
+  "total_paid_prizes": null,
+  "session_notes": "",
+  "whatsapp_map": {},
+  "ui_state": {
+    "geometry": null,
+    "window_state": null,
+    "splitter_state": null,
+    "selected_block_id": "2cc5c83471ca4bcdb199da5f8e686dbc",
+    "selected_page_id": "17cac62017c5454091bbee425dde7329",
+    "selected_line_id": "cf9e5c01947842e4865b4fbbe3a2e424",
+    "selected_column": 0,
+    "extra": {}
+  }
+}

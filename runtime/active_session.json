@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "blocks": [
+    {
+      "block_id": "103ad5f0e82146409ee86bc3c14d701c",
+      "number": "052",
+      "pages": [
+        {
+          "page_id": "bfa8948b46f54d339aaf8d8f677c7c78",
+          "number": 1,
+          "lines": [
+            {
+              "line_id": "df241a69bc3f4a4bbd293f11f7320c49",
+              "raw_text": "52",
+              "spec": {
+                "bet_type": "ERRO",
+                "numbers": [],
+                "flags": [],
+                "raw_text": "52",
+                "normalized_text": "ERRO",
+                "error_message": "Entrada inválida."
+              },
+              "value": null
+            },
+            {
+              "line_id": "7e87a5f8cf6a46c7988407161cda6271",
+              "raw_text": "C 564",
+              "spec": {
+                "bet_type": "C",
+                "numbers": [
+                  "564"
+                ],
+                "flags": [],
+                "raw_text": "C 564",
+                "normalized_text": "C 564",
+                "error_message": null
+              },
+              "value": null
+            },
+            {
+              "line_id": "d0466a44a3e245228e80bb2549ee5475",
+              "raw_text": "M 5442",
+              "spec": {
+                "bet_type": "M",
+                "numbers": [
+                  "5442"
+                ],
+                "flags": [],
+                "raw_text": "M 5442",
+                "normalized_text": "M 5442",
+                "error_message": null
+              },
+              "value": null
+            },
+            {
+              "line_id": "a075da1dd00c49c881e72cb0474413c6",
+              "raw_text": "",
+              "spec": null,
+              "value": null
+            }
+          ]
+        }
+      ],
+      "money_received": null,
+      "whatsapp_phone": null,
+      "money_locked": false
+    }
+  ],
+  "result": null,
+  "percentage": "0.70",
+  "session_name": "",
+  "total_paid_prizes": null,
+  "session_notes": "",
+  "whatsapp_map": {
+    "002": "37998161981"
+  },
+  "ui_state": {
+    "geometry": "AdnQywADAAAAAADSAAAAIgAABq0AAAPYAAAA0gAAAEEAAAatAAAD2AAAAAAAAAAAB4AAAADSAAAAQQAABq0AAAPY",
+    "window_state": "AAAA/wAAAAD9AAAAAAAABdwAAAMmAAAABAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAEAAAAWAG0AYQBpAG4AVABvAG8AbABiAGEAcgEAAAAA/////wAAAAAAAAAA",
+    "splitter_state": "AAAA/wAAAAEAAAADAAACWAAAAYYAAAJYAAAAAAoBAAAAAQA=",
+    "selected_block_id": "103ad5f0e82146409ee86bc3c14d701c",
+    "selected_page_id": "bfa8948b46f54d339aaf8d8f677c7c78",
+    "selected_line_id": "a075da1dd00c49c881e72cb0474413c6",
+    "selected_column": 0,
+    "extra": {}
+  }
+}
