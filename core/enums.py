@@ -31,7 +31,6 @@ class RowType(str, Enum):
     BLOCK_HEADER = "block_header"
     PAGE_HEADER = "page_header"
     BET_ENTRY = "bet_entry"
-    PAGE_TOTAL = "page_total"
 
 
 class SlotPosition(str, Enum):

@@ -26,7 +26,7 @@ from core.result_engine import build_result_snapshot, evaluate_line
 from core.summary_engine import build_summary
 from core.validators import ensure_numeric
 from services.commands import SelectionContext
-from services.formatting import format_money, parse_money
+from services.formatting import format_money, format_percentage, parse_money
 from storage.active_session_store import ActiveSessionStore, ActiveSessionToken
 from storage.json_store import JsonStore
 from storage.whatsapp_store import WhatsAppStore
@@ -317,12 +317,6 @@ class BancaController:
         self._recompute()
         self.notify()
 
-    def set_percentage(self, value_text: str) -> None:
-        del value_text
-        self.state.percentage = FIXED_PERCENTAGE
-        self._recompute()
-        self.notify()
-
     def set_block_money(self, block_id: str, value_text: str, force_unlock: bool = False) -> None:
         block = self._get_block(block_id)
         new_value = parse_money(value_text)
@@ -463,7 +457,7 @@ class BancaController:
             return None, None
         page = block.pages[0]
         self.state.ui_state.selected_page_id = page.page_id
-        line = next((item for item in page.lines if True), None)
+        line = page.lines[0] if page.lines else None
         self.state.ui_state.selected_line_id = line.line_id if line else None
         self.notify()
         return page.page_id, self.state.ui_state.selected_line_id
@@ -747,7 +741,7 @@ class BancaController:
         lines = [
             f"Bloco {row.block_number}",
             f"Bruto: {format_money(row.bruto)}",
-            f"Líquido (70%): {format_money(row.liquido)}",
+            f"Líquido ({format_percentage(FIXED_PERCENTAGE)}): {format_money(row.liquido)}",
             f"Dinheiro recebido: {format_money(row.money_received)}",
             f"Saldo: {format_money(row.resultado)}",
         ]

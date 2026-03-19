@@ -32,9 +32,6 @@ TYPE_BY_PREFIX = {
 def _normalize_space(text: str) -> str:
     normalized = unicodedata.normalize("NFKD", text.strip().upper())
     normalized = "".join(char for char in normalized if not unicodedata.combining(char))
-    normalized = normalized.replace("Ã€", "A")
-    normalized = normalized.replace("Ã", "A")
-    normalized = normalized.replace("Ãƒâ‚¬", "A")
     normalized = re.sub(r"\s+", " ", normalized)
     return normalized
 
@@ -100,7 +97,6 @@ def parse_bet_input(raw_text: str, commit_mode: CommitMode = CommitMode.ENTER) -
     normalized = _normalize_compact_aliases(_normalize_space(raw_text))
     if not normalized:
         return None
-    slash_compact = normalized.replace(" ", "")
     if re.fullmatch(r"\d{2}/", slash_compact):
         normalized = f"D {slash_compact[:2]}"
     elif re.fullmatch(r"\d{2}/\d{2}", slash_compact):
@@ -212,6 +208,7 @@ def milhar_iv_permutations(number: str) -> list[str]:
 def expand_closure(start: str, end: str) -> list[str]:
     start_value = int(start)
     end_value = int(end)
+    # Fechamento 000/999 usa passo 111 para gerar apenas as centenas-espelho (000, 111, 222, ..., 999)
     step = 111 if start == "000" and end == "999" else 100
     values = list(range(start_value, end_value + 1, step))
     return [f"{value:03d}" for value in values]

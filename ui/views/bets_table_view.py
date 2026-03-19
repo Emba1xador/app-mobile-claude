@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import logging
+
 from PySide6.QtCore import QEvent, QItemSelection, QItemSelectionModel, QModelIndex, QPoint, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QMouseEvent, QPainter, QPen, QShortcut
+from PySide6.QtGui import QColor, QMouseEvent, QPen, QShortcut
 from PySide6.QtWidgets import QAbstractItemDelegate, QAbstractItemView, QHeaderView, QMenu, QTableView
 
 from core.enums import BetType, CommitMode, Flag, RowType
@@ -10,6 +12,8 @@ from services.commands import SelectionContext
 from ui.delegates.bet_delegate import BetDelegate
 from ui.delegates.value_delegate import ValueDelegate
 from ui.theme import color, tinted
+
+LOGGER = logging.getLogger(__name__)
 
 
 class BetsTableView(QTableView):
@@ -63,9 +67,6 @@ class BetsTableView(QTableView):
         self.resizeRowsToContents()
         self.doItemsLayout()
         self.viewport().update()
-
-    def drawRow(self, painter: QPainter, option, index) -> None:  # noqa: N802
-        super().drawRow(painter, option, index)
 
     def flash_block(self, block_id: str, duration_ms: int = 900) -> None:
         self._flash_block_id = block_id
@@ -514,7 +515,7 @@ class BetsTableView(QTableView):
                 lambda: self._apply_flag_with_restore(line_ids, current_line_id, flag, mode, force_unlock=True),
             )
         except Exception:
-            pass
+            LOGGER.exception("Erro inesperado ao aplicar flag")
         else:
             if changed:
                 QTimer.singleShot(0, lambda: self._focus_next_line_after_flag(current_line_id))
@@ -530,7 +531,6 @@ class BetsTableView(QTableView):
             return
         flagged_text = self.controller.resolve_flag_input(editor.text(), flag, mode="toggle", commit_mode=CommitMode.ENTER)
         if not flagged_text:
-            editor.setText(editor.text())
             editor.end(False)
             return
         payload = {"text": flagged_text, "commit_mode": CommitMode.ENTER}

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import Any
 from uuid import uuid4
 
 from core.enums import BetType, Flag, RowType
@@ -53,10 +52,6 @@ class BetLine:
     @property
     def is_error(self) -> bool:
         return self.spec is not None and self.spec.is_error
-
-    @property
-    def is_editable(self) -> bool:
-        return True
 
     @property
     def is_valid_bet(self) -> bool:
@@ -152,12 +147,3 @@ class ProjectionRow:
     block_pendency_count: int = 0
 
 
-@dataclass(slots=True)
-class SavePayload:
-    version: int
-    blocks: list[dict[str, Any]]
-    result: dict[str, Any] | None
-    percentage: str
-    session_notes: str
-    whatsapp_map: dict[str, str]
-    ui_state: dict[str, Any]

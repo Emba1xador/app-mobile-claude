@@ -670,12 +670,7 @@ class MainWindow(QMainWindow):
 
     def _page_is_really_empty(self, page) -> bool:
         return all(
-            line.is_empty
-            and not line.is_valid_bet
-            and not line.is_error
-            and line.value is None
-            and not line.winners
-            and not (line.raw_text or "").strip()
+            line.is_empty and line.value is None and not line.winners
             for line in page.lines
         )
 
@@ -841,7 +836,6 @@ class MainWindow(QMainWindow):
         dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptOpen)
         dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
         dialog.setOption(QFileDialog.Option.DontUseNativeDialog, True)
-        dialog.setNameFilter("Arquivos JSON (*.json)")
         return dialog
 
     def handle_new_session(self) -> None:
@@ -907,11 +901,11 @@ class MainWindow(QMainWindow):
             return
 
         url = build_mobile_share_url(host, DEFAULT_MOBILE_PORT)
-        backend_ready = is_mobile_backend_reachable(host, DEFAULT_MOBILE_PORT)
+        backend_ready = is_mobile_backend_reachable("127.0.0.1", DEFAULT_MOBILE_PORT)
         backend_result = None
         if not backend_ready:
             backend_result = self._ensure_mobile_backend_running()
-            backend_ready = is_mobile_backend_reachable(host, DEFAULT_MOBILE_PORT)
+            backend_ready = is_mobile_backend_reachable("127.0.0.1", DEFAULT_MOBILE_PORT)
         if not backend_ready:
             startup_message = backend_result.message if backend_result is not None else ""
             prompt_text = (

@@ -164,12 +164,12 @@ def _evaluate_dezena(spec: BetSpec, projections: list[PrizeProjection]) -> list[
             if value == target:
                 winners.append(
                     WinnerHit(
-                    prize_index=projection.prize.prize_index,
-                    prize_label=projection.prize.label,
-                    match_value=value,
-                    detail=f"Dezena na {_slot_text(slot)} do {_prize_text(projection.prize)}",
+                        prize_index=projection.prize.prize_index,
+                        prize_label=projection.prize.label,
+                        match_value=value,
+                        detail=f"Dezena na {_slot_text(slot)} do {_prize_text(projection.prize)}",
+                    )
                 )
-            )
     return _dedupe_hits(winners)
 
 
