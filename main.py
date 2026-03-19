@@ -24,6 +24,7 @@ def main() -> int:
     root = Path(__file__).resolve().parent
     app = QApplication(sys.argv)
     app.setApplicationName("BANCA APP 2.0")
+    app.setStyle("Fusion")
     app_font = app.font()
     app_font.setStyleStrategy(QFont.StyleStrategy.PreferAntialias)
     app_font.setHintingPreference(QFont.HintingPreference.PreferFullHinting)

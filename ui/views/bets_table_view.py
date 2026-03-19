@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import QEvent, QItemSelection, QItemSelectionModel, QModelIndex, QPoint, Qt, QTimer, Signal
-from PySide6.QtGui import QMouseEvent, QPainter, QPen, QShortcut
+from PySide6.QtGui import QColor, QMouseEvent, QPainter, QPen, QShortcut
 from PySide6.QtWidgets import QAbstractItemDelegate, QAbstractItemView, QHeaderView, QMenu, QTableView
 
 from core.enums import BetType, CommitMode, Flag, RowType
@@ -65,14 +65,7 @@ class BetsTableView(QTableView):
         self.viewport().update()
 
     def drawRow(self, painter: QPainter, option, index) -> None:  # noqa: N802
-        row = self.model().row_at(index.row())
         super().drawRow(painter, option, index)
-        painter.save()
-        if row.row_type == RowType.BLOCK_HEADER and index.row() > 0:
-            painter.setPen(QPen(QColor(45, 65, 82), 1.5))
-            y = option.rect.top() + 3
-            painter.drawLine(option.rect.left() + 10, y, option.rect.right() - 10, y)
-        painter.restore()
 
     def flash_block(self, block_id: str, duration_ms: int = 900) -> None:
         self._flash_block_id = block_id

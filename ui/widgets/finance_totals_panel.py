@@ -70,10 +70,10 @@ class FinanceTotalsPanel(QGroupBox):
 
         balance_card = QWidget(self)
         balance_card.setProperty("totalsBalanceCard", True)
-        balance_card.setMaximumHeight(84)
+        balance_card.setMaximumHeight(62)
         balance_layout = QVBoxLayout(balance_card)
-        balance_layout.setContentsMargins(14, 10, 14, 10)
-        balance_layout.setSpacing(2)
+        balance_layout.setContentsMargins(14, 6, 14, 6)
+        balance_layout.setSpacing(1)
         balance_label = QLabel("Saldo final", balance_card)
         balance_label.setProperty("totalsBalanceLabel", True)
         balance_layout.addWidget(balance_label)

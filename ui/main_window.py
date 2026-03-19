@@ -136,7 +136,7 @@ class MainWindow(QMainWindow):
         self.bottom_bar.blockSelected.connect(self.handle_bottom_block_selected)
         status_bar = QStatusBar(self)
         status_bar.setSizeGripEnabled(False)
-        status_bar.setFixedHeight(46)
+        status_bar.setFixedHeight(44)
         status_bar.addPermanentWidget(self.bottom_bar, 1)
         self.setStatusBar(status_bar)
 
@@ -226,7 +226,7 @@ class MainWindow(QMainWindow):
         toolbar = QToolBar("Principal", self)
         toolbar.setMovable(False)
         toolbar.setObjectName("mainToolbar")
-        toolbar.setFixedHeight(64)
+        toolbar.setFixedHeight(52)
         self.addToolBar(toolbar)
 
         open_old_action = QAction("Abrir sessão salva...", self)
@@ -430,7 +430,7 @@ class MainWindow(QMainWindow):
 
         container = QWidget(self)
         container_layout = QHBoxLayout(container)
-        container_layout.setContentsMargins(10, 6, 10, 10)
+        container_layout.setContentsMargins(8, 4, 8, 4)
         container_layout.setSpacing(0)
         container_layout.addWidget(splitter)
         self.setCentralWidget(container)

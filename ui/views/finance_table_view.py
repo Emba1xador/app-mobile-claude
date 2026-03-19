@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from PySide6.QtCore import QPoint, QTimer, Qt, QRect, Signal
-from PySide6.QtGui import QColor, QFont, QFontMetrics, QLinearGradient, QPainter, QPen
+from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPen
 from PySide6.QtWidgets import QAbstractItemDelegate, QAbstractItemView, QHeaderView, QTableView
 
 from core.page_lock import BlockLockedError
 from ui.models.finance_table_model import FinanceTableModel
-from ui.theme import color, tinted
+from ui.theme import COLOR_TOKENS, color, tinted
 
 
 class FinanceHeaderView(QHeaderView):
@@ -28,10 +28,7 @@ class FinanceHeaderView(QHeaderView):
         painter = QPainter(self.viewport())
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         painter.setRenderHint(QPainter.RenderHint.TextAntialiasing, True)
-        gradient = QLinearGradient(self.rect().topLeft(), self.rect().bottomLeft())
-        gradient.setColorAt(0.0, QColor("#101820"))
-        gradient.setColorAt(1.0, QColor("#0C1319"))
-        painter.fillRect(self.rect(), gradient)
+        painter.fillRect(self.rect(), color("panel_bg"))
         model = self.model()
         if model is None:
             return
@@ -160,22 +157,16 @@ class FinanceTableView(QTableView):
         if selected:
             row_rect = option.rect.adjusted(6, 4, -6, -4)
             overlay = QColor(color("focus"))
-            overlay.setAlpha(24)
+            overlay.setAlpha(20)
             painter.setPen(Qt.PenStyle.NoPen)
             painter.setBrush(overlay)
             painter.drawRoundedRect(row_rect, 10, 10)
 
             accent = QColor(color("focus_strong"))
-            accent.setAlpha(206)
+            accent.setAlpha(200)
             painter.fillRect(row_rect.left() + 3, row_rect.top() + 5, 3, row_rect.height() - 10, accent)
 
-            border = QColor(color("focus"))
-            border.setAlpha(96)
-            painter.setPen(QPen(border, 1))
-            painter.setBrush(Qt.BrushStyle.NoBrush)
-            painter.drawRoundedRect(row_rect, 10, 10)
-
-        painter.setPen(QPen(tinted("divider", 30), 1))
+        painter.setPen(QPen(tinted("divider", 40), 0.5))
         painter.drawLine(option.rect.bottomLeft() + QPoint(10, 0), option.rect.bottomRight() - QPoint(10, 0))
         painter.restore()
 

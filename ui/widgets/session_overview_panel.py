@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import QRectF, Qt, Signal
+from PySide6.QtGui import QColor, QFont, QPainter, QPen
 from PySide6.QtWidgets import (
     QFrame,
     QGroupBox,
@@ -15,7 +16,7 @@ from PySide6.QtWidgets import (
 
 
 def _page_label(count: int) -> str:
-    return "1 p\u00e1g" if count == 1 else f"{count} p\u00e1g"
+    return "1 pág" if count == 1 else f"{count} pág"
 
 
 def _bet_label(count: int) -> str:
@@ -23,14 +24,155 @@ def _bet_label(count: int) -> str:
 
 
 def _prize_label(count: int) -> str:
-    return "1 pr\u00eamio" if count == 1 else f"{count} pr\u00eamios"
+    return "1 prêmio" if count == 1 else f"{count} prêmios"
+
+
+class BlockRowWidget(QWidget):
+    """Custom painted block row for session overview — crisp and cohesive."""
+
+    clicked = Signal()
+
+    def __init__(self, text: str, is_selected: bool = False, parent=None) -> None:
+        super().__init__(parent)
+        self.text = text
+        self.is_selected = is_selected
+        self._hovered = False
+        self.setMinimumHeight(38)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setMouseTracking(True)
+
+    def enterEvent(self, event) -> None:
+        self._hovered = True
+        self.update()
+
+    def leaveEvent(self, event) -> None:
+        self._hovered = False
+        self.update()
+
+    def mousePressEvent(self, event) -> None:
+        self.clicked.emit()
+
+    def paintEvent(self, event) -> None:
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        painter.setRenderHint(QPainter.RenderHint.TextAntialiasing, True)
+
+        rect = self.rect()
+        row_rect = rect.adjusted(2, 2, -2, -2)
+
+        # Background — transparent by default, visible on select/hover
+        if self.is_selected:
+            fill = QColor(192, 120, 24, 25)
+        elif self._hovered:
+            fill = QColor(0, 0, 0, 10)
+        else:
+            fill = QColor(0, 0, 0, 0)
+
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(fill)
+        painter.drawRoundedRect(row_rect, 6, 6)
+
+        # Bottom separator
+        if not self.is_selected:
+            painter.setPen(QPen(QColor(0, 0, 0, 16), 0.5))
+            painter.drawLine(row_rect.left() + 8, int(row_rect.bottom()), int(row_rect.right() - 8), int(row_rect.bottom()))
+
+        # Text
+        font = QFont(painter.font())
+        font.setPointSizeF(9.6)
+        font.setWeight(QFont.Weight.DemiBold)
+        painter.setFont(font)
+        painter.setPen(QColor(28, 24, 16) if self.is_selected else QColor(58, 52, 40))
+        text_rect = row_rect.adjusted(10, 0, -8, 0)
+        painter.drawText(text_rect, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, self.text)
+
+        painter.end()
+
+
+class AwardedBlockWidget(QWidget):
+    """Custom painted awarded block row — green accent."""
+
+    clicked = Signal()
+    toggled = Signal(bool)
+
+    def __init__(self, text: str, is_selected: bool = False, parent=None) -> None:
+        super().__init__(parent)
+        self.text = text
+        self.is_selected = is_selected
+        self._hovered = False
+        self._expanded = False
+        self.setMinimumHeight(40)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setMouseTracking(True)
+
+    def set_expanded(self, expanded: bool) -> None:
+        self._expanded = expanded
+        self.update()
+
+    def enterEvent(self, event) -> None:
+        self._hovered = True
+        self.update()
+
+    def leaveEvent(self, event) -> None:
+        self._hovered = False
+        self.update()
+
+    def mousePressEvent(self, event) -> None:
+        self._expanded = not self._expanded
+        self.toggled.emit(self._expanded)
+        self.clicked.emit()
+        self.update()
+
+    def paintEvent(self, event) -> None:
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        painter.setRenderHint(QPainter.RenderHint.TextAntialiasing, True)
+
+        rect = self.rect()
+        row_rect = rect.adjusted(2, 1, -2, -1)
+
+        # Subtle bg on hover
+        if self._hovered:
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.setBrush(QColor(0, 0, 0, 8))
+            painter.drawRoundedRect(row_rect, 4, 4)
+
+        # Left accent bar — green
+        bar_rect = QRectF(row_rect.left() + 4, row_rect.top() + 8, 3, row_rect.height() - 16)
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(QColor(26, 140, 60))
+        painter.drawRoundedRect(bar_rect, 1.5, 1.5)
+
+        # Arrow — small triangle
+        arrow_font = QFont(painter.font())
+        arrow_font.setPointSizeF(7.5)
+        arrow_font.setBold(True)
+        painter.setFont(arrow_font)
+        painter.setPen(QColor(26, 140, 60))
+        arrow_rect = QRectF(row_rect.left() + 14, row_rect.top(), 14, row_rect.height())
+        painter.drawText(arrow_rect, Qt.AlignmentFlag.AlignCenter, "\u25be" if self._expanded else "\u25b8")
+
+        # Text
+        font = QFont(painter.font())
+        font.setPointSizeF(9.3)
+        font.setWeight(QFont.Weight.DemiBold)
+        painter.setFont(font)
+        painter.setPen(QColor(26, 92, 44))
+        text_rect = QRectF(row_rect.left() + 30, row_rect.top(), row_rect.width() - 38, row_rect.height())
+        painter.drawText(text_rect, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, self.text)
+
+        # Bottom separator
+        painter.setPen(QPen(QColor(0, 0, 0, 12), 0.5))
+        painter.drawLine(int(row_rect.left()) + 10, int(row_rect.bottom()), int(row_rect.right()) - 6, int(row_rect.bottom()))
+
+        painter.end()
 
 
 class SessionOverviewPanel(QGroupBox):
     blockNavigationRequested = Signal(str)
 
     def __init__(self, parent=None) -> None:
-        super().__init__("Resumo da sess\u00e3o", parent)
+        super().__init__("Resumo da sessão", parent)
         self.setObjectName("sessionOverviewPanel")
         self._result_loaded: bool | None = None
         self._selected_block_id = ""
@@ -40,7 +182,7 @@ class SessionOverviewPanel(QGroupBox):
         self.tab_bar_widget = QWidget(self)
         tab_layout = QHBoxLayout(self.tab_bar_widget)
         tab_layout.setContentsMargins(0, 0, 0, 0)
-        tab_layout.setSpacing(10)
+        tab_layout.setSpacing(6)
         for index, label in enumerate(("Blocos", "Premiados")):
             button = QToolButton(self.tab_bar_widget)
             button.setCheckable(True)
@@ -59,7 +201,7 @@ class SessionOverviewPanel(QGroupBox):
         self.stack.addWidget(self.awarded_page)
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(12, 10, 12, 8)
+        layout.setContentsMargins(8, 8, 8, 6)
         layout.setSpacing(8)
         layout.addWidget(self.tab_bar_widget)
         layout.addWidget(self.stack, 1)
@@ -95,7 +237,7 @@ class SessionOverviewPanel(QGroupBox):
         container = QWidget(scroll_area)
         layout = QVBoxLayout(container)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(8)
+        layout.setSpacing(4)
         layout.addStretch(1)
         scroll_area.setWidget(container)
         return scroll_area, layout
@@ -110,22 +252,18 @@ class SessionOverviewPanel(QGroupBox):
     def _render_blocks(self, blocks: list[dict[str, object]]) -> None:
         self._clear_layout(self.blocks_layout)
         if not blocks:
-            self.blocks_layout.insertWidget(0, self._build_empty_state("Nenhum bloco nesta sess\u00e3o."))
+            self.blocks_layout.insertWidget(0, self._build_empty_state("Nenhum bloco nesta sessão."))
             return
 
         for block in blocks:
-            button = QToolButton(self.blocks_page)
-            button.setProperty("overviewRow", True)
-            button.setProperty("overviewKind", "block")
-            button.setProperty("overviewSelected", str(block["block_id"]) == self._selected_block_id)
-            button.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextOnly)
-            button.setAutoRaise(True)
-            button.setText(self._block_row_text(block))
-            button.setMinimumHeight(34)
-            button.clicked.connect(
-                lambda checked=False, block_id=str(block["block_id"]): self.blockNavigationRequested.emit(block_id)
+            row_widget = BlockRowWidget(
+                text=self._block_row_text(block),
+                is_selected=str(block["block_id"]) == self._selected_block_id,
+                parent=self.blocks_page,
             )
-            self.blocks_layout.insertWidget(self.blocks_layout.count() - 1, button)
+            block_id = str(block["block_id"])
+            row_widget.clicked.connect(lambda bid=block_id: self.blockNavigationRequested.emit(bid))
+            self.blocks_layout.insertWidget(self.blocks_layout.count() - 1, row_widget)
 
     def _render_awarded_blocks(self, awarded_blocks: list[dict[str, object]], *, result_loaded: bool) -> None:
         self._clear_layout(self.awarded_layout)
@@ -140,40 +278,31 @@ class SessionOverviewPanel(QGroupBox):
         for block in awarded_blocks:
             block_id = str(block["block_id"])
             container = QWidget(self.awarded_page)
-            container.setProperty("overviewAwardedGroup", True)
-            container.setProperty("overviewSelected", block_id == self._selected_block_id)
             container_layout = QVBoxLayout(container)
             container_layout.setContentsMargins(0, 0, 0, 0)
             container_layout.setSpacing(3)
 
-            button = QToolButton(container)
-            button.setProperty("overviewRow", True)
-            button.setProperty("overviewKind", "awarded")
-            button.setProperty("overviewSelected", block_id == self._selected_block_id)
-            button.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
-            button.setArrowType(
-                Qt.ArrowType.DownArrow if block_id in self._expanded_awarded_block_ids else Qt.ArrowType.RightArrow
+            header = AwardedBlockWidget(
+                text=(
+                    f"Bloco {block['block_number']} \u2022 {_page_label(int(block['page_count']))} \u2022 "
+                    f"{_prize_label(int(block['prize_count']))}"
+                ),
+                is_selected=block_id == self._selected_block_id,
+                parent=container,
             )
-            button.setCheckable(True)
-            button.setChecked(block_id in self._expanded_awarded_block_ids)
-            button.setMinimumHeight(36)
-            button.setText(
-                f"Bloco {block['block_number']} \u2022 {_page_label(int(block['page_count']))} \u2022 "
-                f"{_prize_label(int(block['prize_count']))}"
-            )
+            header.set_expanded(block_id in self._expanded_awarded_block_ids)
 
             details_widget = QWidget(container)
-            details_widget.setProperty("overviewDetails", True)
-            details_widget.setVisible(button.isChecked())
+            details_widget.setVisible(block_id in self._expanded_awarded_block_ids)
             details_layout = QVBoxLayout(details_widget)
-            details_layout.setContentsMargins(24, 0, 4, 4)
+            details_layout.setContentsMargins(20, 2, 4, 6)
             details_layout.setSpacing(4)
 
             for detail in block["details"]:
                 detail_row = QWidget(details_widget)
                 detail_row.setProperty("overviewDetailRow", True)
                 detail_row_layout = QVBoxLayout(detail_row)
-                detail_row_layout.setContentsMargins(10, 5, 10, 5)
+                detail_row_layout.setContentsMargins(10, 6, 10, 6)
                 detail_row_layout.setSpacing(2)
 
                 bet_label = QLabel(str(detail["bet_text"]), detail_row)
@@ -182,7 +311,7 @@ class SessionOverviewPanel(QGroupBox):
 
                 meta_label = QLabel(
                     (
-                        f"P\u00e1g. {detail['page_number']} \u2022 Linha {detail['line_number']} \u2022 "
+                        f"Pág. {detail['page_number']} \u2022 Linha {detail['line_number']} \u2022 "
                         f"{str(detail['text']).split(' \u2022 ')[-1]}"
                     ),
                     detail_row,
@@ -192,17 +321,17 @@ class SessionOverviewPanel(QGroupBox):
                 detail_row_layout.addWidget(meta_label)
                 details_layout.addWidget(detail_row)
 
-            def _toggle_details(checked: bool, *, target_button=button, block_key=block_id, panel=details_widget) -> None:
-                target_button.setArrowType(Qt.ArrowType.DownArrow if checked else Qt.ArrowType.RightArrow)
+            def _toggle_details(checked: bool, *, block_key=block_id, panel=details_widget, hdr=header) -> None:
                 panel.setVisible(checked)
+                hdr.set_expanded(checked)
                 if checked:
                     self._expanded_awarded_block_ids.add(block_key)
                 else:
                     self._expanded_awarded_block_ids.discard(block_key)
 
-            button.clicked.connect(lambda checked=False, target=block_id: self.blockNavigationRequested.emit(target))
-            button.toggled.connect(_toggle_details)
-            container_layout.addWidget(button)
+            header.clicked.connect(lambda bid=block_id: self.blockNavigationRequested.emit(bid))
+            header.toggled.connect(_toggle_details)
+            container_layout.addWidget(header)
             container_layout.addWidget(details_widget)
             self.awarded_layout.insertWidget(self.awarded_layout.count() - 1, container)
 

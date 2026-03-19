@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PySide6.QtCore import QSize, Qt
+from PySide6.QtCore import QRectF, QSize, Qt
 from PySide6.QtGui import QColor, QFont, QPainter, QPen
 from PySide6.QtWidgets import QStyledItemDelegate, QStyle
 
@@ -35,12 +35,12 @@ class ValueDelegate(QStyledItemDelegate):
         row = index.model().data(index, BetsTableModel.ROW_ROLE)
         compact = bool(getattr(self.view, "compact_mode", False))
         if row.row_type == RowType.BLOCK_HEADER:
-            return QSize(option.rect.width(), 54 if compact else 70)
+            return QSize(option.rect.width(), 58 if compact else 74)
         if row.row_type == RowType.PAGE_HEADER:
-            return QSize(option.rect.width(), 28 if compact else 34)
+            return QSize(option.rect.width(), 32 if compact else 40)
         if row.row_type == RowType.BET_ENTRY and row.is_trailing_blank:
-            return QSize(option.rect.width(), 26 if compact else 30)
-        return QSize(option.rect.width(), 24 if compact else 28)
+            return QSize(option.rect.width(), 30 if compact else 36)
+        return QSize(option.rect.width(), 32 if compact else 38)
 
     def paint(self, painter: QPainter, option, index) -> None:
         if self.finance:
@@ -57,19 +57,22 @@ class ValueDelegate(QStyledItemDelegate):
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         painter.setRenderHint(QPainter.RenderHint.TextAntialiasing, True)
         active = bool(option.state & QStyle.StateFlag.State_Selected) or is_current_row(option, index)
-        rect = option.rect.adjusted(8, 3, -12, -3)
+        rect = QRectF(option.rect.adjusted(4, 4, -8, -4))
 
         text = str(index.data() or "")
         if not text:
+            painter.restore()
             return
+
         font = QFont(painter.font())
         pen_color = color("text")
+
         if row.line_ref is not None:
             if row.line_ref.value is not None:
-                font.setPointSizeF(9.5 if getattr(self.view, "compact_mode", False) else 10.0)
-                font.setBold(True)
+                font.setPointSizeF(10.5 if getattr(self.view, "compact_mode", False) else 11.0)
+                font.setWeight(QFont.Weight.Bold)
             else:
-                font.setPointSizeF(8.0 if getattr(self.view, "compact_mode", False) else 8.5)
+                font.setPointSizeF(8.5 if getattr(self.view, "compact_mode", False) else 9.0)
                 font.setItalic(True)
                 pen_color = color("placeholder")
             if row.line_ref.is_error:
@@ -78,34 +81,13 @@ class ValueDelegate(QStyledItemDelegate):
                 pen_color = color("success_fg")
 
         painter.setFont(font)
-        text_metrics = painter.fontMetrics()
-        pill_width = max(32, text_metrics.horizontalAdvance(text) + 8)
-        pill_rect = rect.adjusted(max(0, rect.width() - pill_width), 0, 0, 0)
 
-        if row.line_ref is not None and (row.line_ref.winners or row.line_ref.is_error or active):
-            pill_fill = QColor(bet_entry_fill(row))
-            if row.line_ref.winners:
-                pill_fill.setAlpha(20)
-            elif row.line_ref.is_error:
-                pill_fill.setAlpha(18)
-            else:
-                pill_fill = QColor(SELECTION_FILL)
-                pill_fill.setAlpha(14)
-            painter.setPen(Qt.PenStyle.NoPen)
-            painter.setBrush(pill_fill)
-            painter.drawRoundedRect(pill_rect, 7, 7)
-
-        if active:
-            border = QColor(color("focus"))
-            border.setAlpha(68)
-            painter.setPen(QPen(border, 1))
-            painter.setBrush(Qt.BrushStyle.NoBrush)
-            painter.drawRoundedRect(pill_rect.adjusted(0, 0, -1, -1), 7, 7)
+        # No heavy decorations — just clean text
 
         painter.setFont(font)
         painter.setPen(pen_color)
         painter.drawText(
-            rect.adjusted(2, 0, -2, 0),
+            rect.adjusted(4, 0, -4, 0),
             Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter,
             text,
         )

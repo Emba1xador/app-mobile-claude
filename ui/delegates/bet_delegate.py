@@ -3,7 +3,7 @@ from __future__ import annotations
 import unicodedata
 
 from PySide6.QtCore import QRectF, QSize, Qt, Signal
-from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPen
+from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QLineEdit, QStyledItemDelegate, QStyle
 
 from core.entities import BetSpec
@@ -121,6 +121,28 @@ class NavigationLineEdit(QLineEdit):
         super().keyPressEvent(event)
 
 
+# ═══════════════════════════════════════════════════════════════════
+#  NEW DESIGN — BetDelegate v2
+#  Clear hierarchy: Block (big card) > Page (section bar) > Bet (data row)
+#  Bigger numbers, bigger badges, less wasted space
+# ═══════════════════════════════════════════════════════════════════
+
+# Layout constants
+_MARGIN_LEFT = 8       # Left margin for ALL content
+_MARGIN_RIGHT = 8      # Right margin
+_BLOCK_INSET = 4       # Block card inset from edges
+_PAGE_INSET = 12       # Page bar inset (slightly inside block)
+_BET_INSET = 20        # Bet row left start (inside page context)
+_BET_BADGE_GAP = 10    # Gap between badge and number
+_BET_NUMBER_SIZE = 13.0  # Primary number font size (was 10.5!)
+_BET_NUMBER_SIZE_COMPACT = 11.5
+_BADGE_FONT_SIZE = 7.8    # Badge text (was 6.6!)
+_BADGE_FONT_SIZE_SMALL = 7.0
+_BADGE_HEIGHT = 17
+_BADGE_HEIGHT_SMALL = 14
+_BADGE_RADIUS = 5
+
+
 class BetDelegate(QStyledItemDelegate):
     def __init__(self, view) -> None:
         super().__init__(view)
@@ -146,18 +168,22 @@ class BetDelegate(QStyledItemDelegate):
         row = index.model().data(index, BetsTableModel.ROW_ROLE)
         compact = bool(getattr(self.view, "compact_mode", False))
         if row.row_type == RowType.BLOCK_HEADER:
-            return QSize(option.rect.width(), 54 if compact else 70)
+            return QSize(option.rect.width(), 58 if compact else 74)
         if row.row_type == RowType.PAGE_HEADER:
-            return QSize(option.rect.width(), 28 if compact else 34)
+            return QSize(option.rect.width(), 32 if compact else 40)
         if row.row_type == RowType.BET_ENTRY and row.is_trailing_blank:
-            return QSize(option.rect.width(), 26 if compact else 30)
-        return QSize(option.rect.width(), 24 if compact else 28)
+            return QSize(option.rect.width(), 30 if compact else 36)
+        return QSize(option.rect.width(), 32 if compact else 38)
 
     def paint(self, painter: QPainter, option, index) -> None:
         row = index.model().data(index, BetsTableModel.ROW_ROLE)
         painter.save()
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         painter.setRenderHint(QPainter.RenderHint.TextAntialiasing, True)
+
+        # ── Block card frame — continuous card for all rows in a block ──
+        self._paint_block_card_frame(painter, option, index, row)
+
         if row.row_type == RowType.BLOCK_HEADER:
             self._paint_block_header(painter, option, row)
         elif row.row_type == RowType.PAGE_HEADER:
@@ -166,7 +192,86 @@ class BetDelegate(QStyledItemDelegate):
             self._paint_bet_line(painter, option, index, row)
         painter.restore()
 
-    # ── Block header: prominent card with OPAQUE fills ─────────────
+    # ══════════════════════════════════════════════════════════════
+    #  BLOCK CARD FRAME — continuous card enclosing all rows in a block
+    # ══════════════════════════════════════════════════════════════
+
+    def _paint_block_card_frame(self, painter: QPainter, option, index, row) -> None:
+        is_first = row.row_type == RowType.BLOCK_HEADER
+        model = index.model()
+        next_idx = index.row() + 1
+        is_last = True
+        if next_idx < model.rowCount():
+            next_row = model.data(model.index(next_idx, 0), BetsTableModel.ROW_ROLE)
+            if next_row and next_row.block_id == row.block_id:
+                is_last = False
+
+        current = self.view.controller.state.ui_state.selected_block_id == row.block_id
+
+        rect = QRectF(option.rect)
+        # First row gets extra top margin to separate from previous card
+        top_offset = 6.0 if is_first else 0.0
+        bot_offset = 4.0 if is_last else 0.0
+        card_rect = QRectF(
+            rect.left() + 6,
+            rect.top() + top_offset,
+            rect.width() - 12,
+            rect.height() - top_offset - bot_offset,
+        )
+        radius = 8.0
+
+        # Card fill — WHITE to stand out from beige window background
+        if current:
+            fill = QColor(255, 253, 248)  # warm white
+        else:
+            fill = QColor(248, 244, 236)  # off-white cream
+        border_clr = QColor(200, 192, 176)  # visible warm border
+
+        # Build path with rounded corners only at top/bottom of block
+        path = QPainterPath()
+        if is_first and is_last:
+            path.addRoundedRect(card_rect, radius, radius)
+        elif is_first:
+            path.moveTo(card_rect.left(), card_rect.bottom())
+            path.lineTo(card_rect.left(), card_rect.top() + radius)
+            path.quadTo(card_rect.left(), card_rect.top(), card_rect.left() + radius, card_rect.top())
+            path.lineTo(card_rect.right() - radius, card_rect.top())
+            path.quadTo(card_rect.right(), card_rect.top(), card_rect.right(), card_rect.top() + radius)
+            path.lineTo(card_rect.right(), card_rect.bottom())
+            path.closeSubpath()
+        elif is_last:
+            path.moveTo(card_rect.left(), card_rect.top())
+            path.lineTo(card_rect.left(), card_rect.bottom() - radius)
+            path.quadTo(card_rect.left(), card_rect.bottom(), card_rect.left() + radius, card_rect.bottom())
+            path.lineTo(card_rect.right() - radius, card_rect.bottom())
+            path.quadTo(card_rect.right(), card_rect.bottom(), card_rect.right(), card_rect.bottom() - radius)
+            path.lineTo(card_rect.right(), card_rect.top())
+            path.closeSubpath()
+        else:
+            path.addRect(card_rect)
+
+        # Draw card with shadow effect — slight offset darker rect behind
+        if is_first:
+            shadow = QPainterPath()
+            shadow_rect = card_rect.adjusted(1, 1, 1, 0)
+            shadow.addRoundedRect(shadow_rect, radius, radius)
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.setBrush(QColor(0, 0, 0, 12))
+            painter.drawPath(shadow)
+
+        painter.setPen(QPen(border_clr, 1.0))
+        painter.setBrush(fill)
+        painter.drawPath(path)
+
+        # For middle/last rows, ensure continuous side borders
+        if not is_first:
+            painter.setPen(QPen(border_clr, 1.0))
+            painter.drawLine(int(card_rect.left()), int(card_rect.top()), int(card_rect.left()), int(card_rect.bottom()))
+            painter.drawLine(int(card_rect.right()), int(card_rect.top()), int(card_rect.right()), int(card_rect.bottom()))
+
+    # ══════════════════════════════════════════════════════════════
+    #  BLOCK HEADER — Big prominent card
+    # ══════════════════════════════════════════════════════════════
 
     def _paint_block_header(self, painter: QPainter, option, row) -> None:
         compact = bool(getattr(self.view, "compact_mode", False))
@@ -174,102 +279,96 @@ class BetDelegate(QStyledItemDelegate):
         flashed = getattr(self.view, "_flash_block_id", None) == row.block_id
         expanded = row.block_id in self.view.model().expanded_block_ids
 
-        card = QRectF(option.rect.adjusted(4, 6 if compact else 8, -6, -2 if compact else -4))
-
-        # OPAQUE card fill — genuinely different from bg (#131C25)
-        if current:
-            fill_color = QColor(30, 52, 72)    # #1E3448 — clearly lighter
-        elif flashed:
-            fill_color = QColor(26, 45, 62)    # #1A2D3E
-        else:
-            fill_color = QColor(22, 38, 52)    # #162634 — still visibly different
-        painter.setPen(Qt.PenStyle.NoPen)
-        painter.setBrush(fill_color)
-        painter.drawRoundedRect(card, 10, 10)
-
-        # VISIBLE border — opaque, not alpha-blended
-        if current:
-            border_color = QColor(58, 100, 135)   # bright teal border
-        elif flashed:
-            border_color = QColor(48, 82, 110)
-        else:
-            border_color = QColor(38, 60, 78)     # muted but still visible
-        painter.setPen(QPen(border_color, 1.2))
-        painter.setBrush(Qt.BrushStyle.NoBrush)
-        painter.drawRoundedRect(card.adjusted(0.6, 0.6, -0.6, -0.6), 10, 10)
-
-        # SOLID accent bar — full saturated color, no alpha reduction
-        if current or flashed:
-            bar_color = color("focus_strong")      # #73C4D5 — bright cyan
-        else:
-            bar_color = color("focus")             # #4B96AE — still clearly colored
-        painter.setPen(Qt.PenStyle.NoPen)
-        painter.setBrush(bar_color)
-        bar_pad = 7 if compact else 9
-        painter.drawRoundedRect(
-            QRectF(card.left() + 6, card.top() + bar_pad, 4.0, card.height() - bar_pad * 2),
-            2, 2,
+        rect = QRectF(option.rect)
+        card = QRectF(
+            rect.left() + _BLOCK_INSET + 4,
+            rect.top() + (4 if not compact else 2),
+            rect.width() - _BLOCK_INSET * 2 - 8,
+            rect.height() - (6 if not compact else 4),
         )
 
-        # Layout: top half = title row, bottom half = metrics row
-        content_left = card.left() + 18
-        mid_y = card.top() + card.height() / 2
+        # ── Header zone — slightly darker within the block card ──
+        header_fill = QColor(0, 0, 0, 12) if current else QColor(0, 0, 0, 8)
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(header_fill)
+        painter.drawRoundedRect(card, 6, 6)
 
-        # Arrow
-        arrow_rect = QRectF(content_left, card.top(), 16, mid_y - card.top())
+        # ── Arrow ──
+        arrow_x = card.left() + 12
         arrow_font = QFont(painter.font())
-        arrow_font.setPointSizeF(9.0 if compact else 10.0)
+        arrow_font.setPointSizeF(11.0 if not compact else 9.5)
         arrow_font.setBold(True)
         painter.setFont(arrow_font)
-        painter.setPen(color("title") if (current or flashed) else color("text_muted"))
-        painter.drawText(arrow_rect, Qt.AlignmentFlag.AlignCenter, "\u25be" if expanded else "\u25b8")
+        arrow_rect = QRectF(arrow_x, card.top(), 18, card.height())
+        painter.setPen(color("title") if current else color("text_muted"))
+        painter.drawText(arrow_rect, Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignCenter,
+                         "\u25be" if expanded else "\u25b8")
 
-        # State badge (top-right)
+        # ── Block number (big, bold) ──
+        title_left = arrow_x + 22
+        title_font = QFont(painter.font())
+        title_font.setPointSizeF(14.0 if not compact else 12.0)
+        title_font.setWeight(QFont.Weight.ExtraBold)
+        painter.setFont(title_font)
+        painter.setPen(color("title") if (current or flashed) else color("text"))
+
+        # Split into two lines: title on top half, meta on bottom half
+        top_half = QRectF(title_left, card.top(), card.right() - title_left - 10, card.height() * 0.55)
+        bot_half = QRectF(title_left, card.top() + card.height() * 0.50, card.right() - title_left - 10, card.height() * 0.45)
+
+        # State badge on same line as title
         state_text, state_color = self._block_state_text(row, current=current)
-        state_width = 0
+        state_right_margin = 0
         if state_text:
             state_font = QFont(painter.font())
-            state_font.setPointSizeF(7.0 if compact else 7.5)
+            state_font.setPointSizeF(7.8 if not compact else 7.2)
             state_font.setBold(True)
-            painter.setFont(state_font)
-            state_width = QFontMetrics(state_font).horizontalAdvance(state_text) + 14
-            state_rect = QRectF(card.right() - state_width - 10, card.top(), state_width, mid_y - card.top())
-            dot_rect = QRectF(state_rect.left(), state_rect.center().y() - 2.5, 5, 5)
+            sfm = QFontMetrics(state_font)
+            state_w = sfm.horizontalAdvance(state_text) + 22
+            state_right_margin = state_w + 8
+
+            state_rect = QRectF(card.right() - state_w - 12, card.top(), state_w, card.height() * 0.55)
+
+            # dot
+            dot_r = 4
+            dot_rect = QRectF(state_rect.left(), state_rect.center().y() - dot_r / 2, dot_r, dot_r)
             painter.setPen(Qt.PenStyle.NoPen)
             painter.setBrush(state_color)
             painter.drawEllipse(dot_rect)
+
+            painter.setFont(state_font)
             painter.setPen(state_color)
             painter.drawText(
-                state_rect.adjusted(10, 0, 0, 0),
+                state_rect.adjusted(dot_r + 6, 0, 0, 0),
                 Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
                 state_text,
             )
 
-        # Title
-        title_left = arrow_rect.right() + 6
-        title_right = card.right() - (state_width + 22 if state_text else 14)
-        title_rect = QRectF(title_left, card.top(), max(0.0, title_right - title_left), mid_y - card.top())
-        title_font = QFont(painter.font())
-        title_font.setPointSizeF(10.5 if compact else 12.0)
-        title_font.setBold(True)
+        # Draw block title
         painter.setFont(title_font)
         painter.setPen(color("title") if (current or flashed) else color("text"))
-        painter.drawText(title_rect, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, row.left_text)
-
-        # Metrics
-        metrics_font = QFont(painter.font())
-        metrics_font.setPointSizeF(7.0 if compact else 7.6)
-        painter.setFont(metrics_font)
-        painter.setPen(color("text_subtle"))
-        metrics_rect = QRectF(title_left, mid_y, max(0.0, title_right - title_left), card.bottom() - mid_y)
-        metrics_text = QFontMetrics(metrics_font).elidedText(
-            self._block_metrics_text(row),
-            Qt.TextElideMode.ElideRight,
-            int(metrics_rect.width()),
+        title_available = top_half.width() - state_right_margin
+        elided_title = QFontMetrics(title_font).elidedText(
+            row.left_text, Qt.TextElideMode.ElideRight, int(title_available)
         )
-        painter.drawText(metrics_rect, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, metrics_text)
+        painter.drawText(
+            QRectF(top_half.left(), top_half.top(), title_available, top_half.height()),
+            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
+            elided_title,
+        )
 
-    # ── Page header: visible left bar + label ──────────────────────
+        # ── Metrics line (bottom half) ──
+        meta_font = QFont(painter.font())
+        meta_font.setPointSizeF(8.2 if not compact else 7.4)
+        meta_font.setWeight(QFont.Weight.Medium)
+        painter.setFont(meta_font)
+        painter.setPen(color("text_subtle"))
+        metrics_text = self._block_metrics_text(row)
+        painter.drawText(bot_half, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, metrics_text)
+
+    # ══════════════════════════════════════════════════════════════
+    #  PAGE HEADER — Clear section divider bar
+    # ══════════════════════════════════════════════════════════════
 
     def _paint_page_header(self, painter: QPainter, option, row) -> None:
         compact = bool(getattr(self.view, "compact_mode", False))
@@ -277,80 +376,70 @@ class BetDelegate(QStyledItemDelegate):
         current = current_page_id == row.page_id
 
         rect = QRectF(option.rect)
-        left_x = 94.0
-        right_x = rect.right() - 12.0
 
-        # Current page: tinted background
-        if current:
-            hl = QColor(40, 70, 95, 50)
-            painter.setPen(Qt.PenStyle.NoPen)
-            painter.setBrush(hl)
-            painter.drawRoundedRect(
-                QRectF(left_x, rect.top() + 2, right_x - left_x, rect.height() - 4), 7, 7,
-            )
+        # ── Separator line at top — divides pages within the card ──
+        card_left = rect.left() + 4 + 12
+        card_right = rect.right() - 4 - 12
+        painter.setPen(QPen(QColor(0, 0, 0, 28), 1.0))
+        painter.drawLine(int(card_left), int(rect.top() + 2), int(card_right), int(rect.top() + 2))
 
-        # Top separator line — visible
-        sep = QColor(45, 65, 82)
-        painter.setPen(QPen(sep, 1.0))
-        painter.drawLine(int(left_x + 4), int(rect.top() + 1), int(right_x), int(rect.top() + 1))
-
-        # Left accent bar — solid, visible
-        if current:
-            bar_color = color("focus")             # #4B96AE — bright
-        else:
-            bar_color = QColor(55, 80, 100)        # muted teal — still clearly visible
-        painter.setPen(Qt.PenStyle.NoPen)
-        painter.setBrush(bar_color)
-        bar_h = rect.height() - 12
-        painter.drawRoundedRect(
-            QRectF(left_x + 4, rect.center().y() - bar_h / 2, 3.0, bar_h), 1.5, 1.5,
+        # ── Section bar ──
+        bar_rect = QRectF(
+            rect.left() + _PAGE_INSET + 4,
+            rect.top() + 4,
+            rect.width() - _PAGE_INSET * 2 - 8,
+            rect.height() - 6,
         )
 
-        # Page title
-        text_left = left_x + 14
+        # Background — subtle shading within the card
+        if current:
+            bar_fill = QColor(0, 0, 0, 20)
+        else:
+            bar_fill = QColor(0, 0, 0, 8)
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(bar_fill)
+        painter.drawRoundedRect(bar_rect, 5, 5)
+
+        # ── Page label ──
+        text_left = bar_rect.left() + 12
         title_font = QFont(painter.font())
-        title_font.setPointSizeF(8.6 if compact else 9.2)
-        title_font.setBold(True)
+        title_font.setPointSizeF(10.0 if not compact else 9.0)
+        title_font.setWeight(QFont.Weight.Bold)
         painter.setFont(title_font)
-        page_label = f"P\u00e1gina {row.page_number}"
-        title_width = QFontMetrics(title_font).horizontalAdvance(page_label)
 
-        # Total on right
-        total_text = "" if self._should_hide_page_total(row) else row.right_text
-        total_width = 0
-        if total_text:
-            total_font = QFont(painter.font())
-            total_font.setPointSizeF(7.6 if compact else 8.0)
-            total_font.setBold(True)
-            painter.setFont(total_font)
-            total_width = QFontMetrics(total_font).horizontalAdvance(total_text)
-            total_rect = QRectF(right_x - total_width, rect.top(), total_width, rect.height())
-            painter.setPen(color("text_subtle"))
-            painter.drawText(total_rect, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter, total_text)
+        page_label = f"Página {row.page_number}"
+        title_fm = QFontMetrics(title_font)
+        title_w = title_fm.horizontalAdvance(page_label)
 
-        # Draw title
-        available = max(0.0, right_x - text_left - total_width - 16)
-        title_rect = QRectF(text_left, rect.top(), min(title_width, available), rect.height())
-        painter.setFont(title_font)
-        painter.setPen(color("title") if current else color("text_muted"))
+        painter.setPen(color("title") if current else color("text"))
+        title_rect = QRectF(text_left, bar_rect.top(), title_w + 4, bar_rect.height())
         painter.drawText(title_rect, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, page_label)
 
-        # Meta inline
+        # ── Meta info (bet count) ──
         meta = self._page_meta_text(row)
-        if meta and meta != "Sem apostas" and title_width + 60 < available:
+        if meta and meta != "Sem apostas":
             meta_font = QFont(painter.font())
-            meta_font.setPointSizeF(7.2 if compact else 7.8)
-            meta_font.setBold(False)
+            meta_font.setPointSizeF(8.0 if not compact else 7.4)
+            meta_font.setWeight(QFont.Weight.Normal)
             painter.setFont(meta_font)
             painter.setPen(color("text_subtle"))
-            meta_left = text_left + title_width + 8
-            meta_rect = QRectF(meta_left, rect.top(), max(0.0, available - title_width - 12), rect.height())
-            painter.drawText(
-                meta_rect, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
-                f"\u00b7 {meta}",
-            )
+            meta_rect = QRectF(text_left + title_w + 10, bar_rect.top(), bar_rect.width() - title_w - 120, bar_rect.height())
+            painter.drawText(meta_rect, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, meta)
 
-    # ── Bet line: clean data row ───────────────────────────────────
+        # ── Total value on right ──
+        total_text = "" if self._should_hide_page_total(row) else row.right_text
+        if total_text:
+            total_font = QFont(painter.font())
+            total_font.setPointSizeF(9.0 if not compact else 8.2)
+            total_font.setWeight(QFont.Weight.Bold)
+            painter.setFont(total_font)
+            painter.setPen(color("text") if current else color("text_muted"))
+            total_rect = QRectF(bar_rect.right() - 120, bar_rect.top(), 108, bar_rect.height())
+            painter.drawText(total_rect, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter, total_text)
+
+    # ══════════════════════════════════════════════════════════════
+    #  BET LINE — Big numbers, clear badges, clean layout
+    # ══════════════════════════════════════════════════════════════
 
     def _paint_bet_line(self, painter: QPainter, option, index, row) -> None:
         compact = bool(getattr(self.view, "compact_mode", False))
@@ -358,103 +447,86 @@ class BetDelegate(QStyledItemDelegate):
         if line is None:
             return
 
-        content_rect = QRectF(option.rect.adjusted(106, 1, -12, -1))
+        # Content area — starts much closer to left edge than before
+        content_rect = QRectF(option.rect.adjusted(_BET_INSET, 2, -_MARGIN_RIGHT, -2))
         active = bool(option.state & QStyle.StateFlag.State_Selected) or is_current_row(option, index)
 
-        # Row fill for special states
-        if line.winners or line.is_error or active:
-            row_fill = bet_entry_fill(row)
-            if line.winners:
-                row_fill.setAlpha(14)
-            elif line.is_error:
-                row_fill.setAlpha(12)
-            else:
-                row_fill = QColor(SELECTION_FILL)
-                row_fill.setAlpha(12)
-            painter.setPen(Qt.PenStyle.NoPen)
-            painter.setBrush(row_fill)
-            painter.drawRoundedRect(content_rect, 7, 7)
-
+        # ── Row background — ONLY for special states, minimal decoration ──
         if line.winners:
-            accent = QColor(color("success_detail"))
-            accent.setAlpha(184)
-            painter.setBrush(accent)
-            painter.drawRoundedRect(QRectF(content_rect.left(), content_rect.top() + 4, 2.0, content_rect.height() - 8), 1.1, 1.1)
-            border = QColor(color("success_detail"))
-            border.setAlpha(28)
-            painter.setPen(QPen(border, 1))
-            painter.setBrush(Qt.BrushStyle.NoBrush)
-            painter.drawRoundedRect(content_rect.adjusted(0.5, 0.5, -0.5, -0.5), 7, 7)
             painter.setPen(Qt.PenStyle.NoPen)
+            painter.setBrush(QColor(26, 140, 60, 30))
+            painter.drawRoundedRect(content_rect, 6, 6)
         elif line.is_error:
-            accent = QColor(color("danger_detail"))
-            accent.setAlpha(164)
-            painter.setBrush(accent)
-            painter.drawRoundedRect(QRectF(content_rect.left(), content_rect.top() + 4, 2.0, content_rect.height() - 8), 1.1, 1.1)
-
-        if active:
-            active_border = QColor(color("focus"))
-            active_border.setAlpha(54)
-            painter.setPen(QPen(active_border, 1))
-            painter.setBrush(Qt.BrushStyle.NoBrush)
-            painter.drawRoundedRect(content_rect.adjusted(0.5, 0.5, -0.5, -0.5), 7, 7)
-
             painter.setPen(Qt.PenStyle.NoPen)
-            painter.setBrush(color("focus_strong"))
-            painter.drawRoundedRect(QRectF(content_rect.left(), content_rect.top() + 4, 2.0, content_rect.height() - 8), 1.1, 1.1)
+            painter.setBrush(QColor(204, 56, 56, 25))
+            painter.drawRoundedRect(content_rect, 6, 6)
+        elif active:
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.setBrush(QColor(192, 120, 24, 25))
+            painter.drawRoundedRect(content_rect, 6, 6)
 
+        # ── Empty line = action row ──
         if line.is_empty:
             self._paint_action_row(painter, content_rect, compact, active)
             return
 
+        # ── Error line ──
         if line.is_error:
-            self._paint_error_row(painter, content_rect, line.raw_text or "Entrada inv\u00e1lida", compact)
+            self._paint_error_row(painter, content_rect, line.raw_text or "Entrada inválida", compact)
             return
 
         spec = line.spec
         if spec is None:
             return
 
-        badge_y = int(content_rect.top() + (4 if compact else 5))
+        # ── Layout: [BADGE] [NUMBER ......... ] [FLAGS] [PRIZE] ──
+        inner_left = content_rect.left() + 12
+        inner_right = content_rect.right() - 8
+
+        # Type badge
+        badge_y = int(content_rect.center().y() - _BADGE_HEIGHT / 2)
         type_text, number_text, flag_texts = self.display_tokens(spec)
         type_fg, type_bg = TYPE_COLORS.get(spec.bet_type, (color("text_muted"), color("surface_bg")))
-        type_end = self._draw_badge(
+        badge_end = self._draw_badge(
             painter,
-            int(content_rect.left() + 12),
+            int(inner_left),
             badge_y,
             type_text,
             QColor(type_fg),
             QColor(type_bg),
-            small=True,
+            small=False,
         )
 
-        prize_rect = QRectF(content_rect.right() - 128, content_rect.top(), 122, content_rect.height())
+        # Prize text (right-aligned, if winner)
+        prize_width = 0
         if row.right_text:
             prize_font = QFont(painter.font())
-            prize_font.setPointSizeF(7.4 if compact else 7.9)
-            prize_font.setBold(True)
+            prize_font.setPointSizeF(8.6 if compact else 9.2)
+            prize_font.setWeight(QFont.Weight.Bold)
             painter.setFont(prize_font)
+            pfm = QFontMetrics(prize_font)
+            prize_width = pfm.horizontalAdvance(row.right_text) + 16
+            prize_rect = QRectF(inner_right - prize_width, content_rect.top(), prize_width, content_rect.height())
             painter.setPen(color("success_detail"))
-            prize_text = QFontMetrics(prize_font).elidedText(
-                row.right_text,
-                Qt.TextElideMode.ElideLeft,
-                int(prize_rect.width()),
-            )
-            painter.drawText(prize_rect, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter, prize_text)
+            painter.drawText(prize_rect, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter, row.right_text)
 
-        primary_font = QFont(painter.font())
-        primary_font.setPointSizeF(9.8 if compact else 10.5)
-        primary_font.setBold(True)
-        painter.setFont(primary_font)
-        painter.setPen(color("bet_text"))
+        # ── NUMBER — the main event, BIG and bold ──
+        number_font = QFont(painter.font())
+        number_font.setPointSizeF(_BET_NUMBER_SIZE_COMPACT if compact else _BET_NUMBER_SIZE)
+        number_font.setWeight(QFont.Weight.Bold)
+        painter.setFont(number_font)
+        painter.setPen(color("title") if (active or line.winners) else color("bet_text"))
 
-        number_left = max(int(content_rect.left() + 68), type_end + 12)
-        number_right = int(prize_rect.left() - 12) if row.right_text else int(content_rect.right() - 12)
+        number_left = badge_end + _BET_BADGE_GAP
+        number_right = inner_right - prize_width - 8
         number_rect = QRectF(number_left, content_rect.top(), max(0, number_right - number_left), content_rect.height())
-        number_width = min(QFontMetrics(primary_font).horizontalAdvance(number_text), int(number_rect.width()))
+        nfm = QFontMetrics(number_font)
+        number_actual_w = nfm.horizontalAdvance(number_text)
         painter.drawText(number_rect, Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft, number_text)
 
-        flag_x = int(number_rect.left()) + number_width + 10
+        # ── Flag badges (after number) ──
+        flag_x = int(number_left + number_actual_w + 10)
+        flag_badge_y = int(content_rect.center().y() - _BADGE_HEIGHT_SMALL / 2)
         for flag_text, flag in zip(flag_texts, spec.flags, strict=False):
             fg, bg = FLAG_COLORS.get(flag, (color("text_muted"), color("surface_bg")))
             if flag_x >= number_right - 28:
@@ -462,94 +534,70 @@ class BetDelegate(QStyledItemDelegate):
             flag_x = self._draw_badge(
                 painter,
                 flag_x,
-                badge_y + (2 if compact else 3),
+                flag_badge_y,
                 flag_text,
                 QColor(fg),
                 QColor(bg),
                 small=True,
-            ) + 5
+            ) + 6
 
-    # ── Action row ─────────────────────────────────────────────────
+    # ══════════════════════════════════════════════════════════════
+    #  ACTION ROW — "+ Nova aposta"
+    # ══════════════════════════════════════════════════════════════
 
     def _paint_action_row(self, painter: QPainter, rect: QRectF, compact: bool, active: bool) -> None:
-        button_width = min(rect.width() - 12, 150 if compact else 168)
-        action_rect = QRectF(rect.left() + 4, rect.top() + 2, button_width, rect.height() - 4)
-        fill = QColor(color("surface_alt"))
-        fill.setAlpha(20 if active else 10)
-        border = QColor(color("focus") if active else color("divider"))
-        border.setAlpha(56 if active else 24)
-        painter.setPen(QPen(border, 1))
-        painter.setBrush(fill)
-        painter.drawRoundedRect(action_rect, 8, 8)
-
-        plus_color = QColor(color("focus_strong") if active else color("text_muted"))
-        plus_color.setAlpha(196 if active else 142)
-        plus_rect = QRectF(action_rect.left() + 10, action_rect.center().y() - 6, 12, 12)
-        bubble_fill = QColor(color("surface_alt"))
-        bubble_fill.setAlpha(34 if active else 18)
-        painter.setPen(Qt.PenStyle.NoPen)
-        painter.setBrush(bubble_fill)
-        painter.drawEllipse(plus_rect)
-        painter.setPen(QPen(plus_color, 1.3))
-        painter.drawLine(
-            int(plus_rect.center().x()),
-            int(plus_rect.top() + 4),
-            int(plus_rect.center().x()),
-            int(plus_rect.bottom() - 4),
-        )
-        painter.drawLine(
-            int(plus_rect.left() + 4),
-            int(plus_rect.center().y()),
-            int(plus_rect.right() - 4),
-            int(plus_rect.center().y()),
-        )
-
+        # Simple text-only action — lightweight, no heavy box
+        text_color = color("focus_strong") if active else color("text_subtle")
         font = QFont(painter.font())
-        font.setPointSizeF(8.3 if compact else 8.8)
-        font.setBold(True)
+        font.setPointSizeF(9.0 if not compact else 8.4)
+        font.setWeight(QFont.Weight.DemiBold)
         painter.setFont(font)
-        painter.setPen(color("focus_strong") if active else color("text_subtle"))
-        painter.drawText(
-            action_rect.adjusted(30, 0, -12, 0),
-            Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft,
-            "+ Nova aposta",
-        )
+        painter.setPen(text_color)
+        text_rect = QRectF(rect.left() + 14, rect.top(), rect.width() - 28, rect.height())
+        painter.drawText(text_rect, Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft, "+ Nova aposta")
 
-    # ── Error row ──────────────────────────────────────────────────
+    # ══════════════════════════════════════════════════════════════
+    #  ERROR ROW
+    # ══════════════════════════════════════════════════════════════
 
     def _paint_error_row(self, painter: QPainter, rect: QRectF, text: str, compact: bool) -> None:
+        inner_left = rect.left() + 12
+        badge_y = int(rect.center().y() - _BADGE_HEIGHT / 2)
         badge_end = self._draw_badge(
             painter,
-            int(rect.left() + 10),
-            int(rect.top() + (4 if compact else 5)),
+            int(inner_left),
+            badge_y,
             "ERRO",
             color("danger_fg"),
             color("danger_bg"),
-            small=compact,
+            small=False,
         )
-        error_rect = QRectF(badge_end + 10, rect.top(), rect.width() - (badge_end - rect.left()) - 20, rect.height())
+        error_rect = QRectF(badge_end + 12, rect.top(), rect.right() - badge_end - 20, rect.height())
         font = QFont(painter.font())
-        font.setPointSizeF(9.4 if compact else 10.0)
-        font.setBold(True)
+        font.setPointSizeF(11.0 if not compact else 10.0)
+        font.setWeight(QFont.Weight.Bold)
         painter.setFont(font)
         painter.setPen(color("danger_fg"))
-        painter.drawText(error_rect, Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft, text)
+        elided = QFontMetrics(font).elidedText(text, Qt.TextElideMode.ElideRight, int(error_rect.width()))
+        painter.drawText(error_rect, Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft, elided)
 
-    # ── Helpers ────────────────────────────────────────────────────
+    # ══════════════════════════════════════════════════════════════
+    #  HELPERS
+    # ══════════════════════════════════════════════════════════════
 
     def _block_metrics_text(self, row) -> str:
-        page_label = "1 p\u00e1gina" if row.block_page_count == 1 else f"{row.block_page_count} p\u00e1ginas"
+        page_label = "1 página" if row.block_page_count == 1 else f"{row.block_page_count} páginas"
         bet_label = "1 aposta" if row.block_bet_count == 1 else f"{row.block_bet_count} apostas"
-        return f"{page_label} \u2022 {bet_label}"
+        return f"{page_label}  •  {bet_label}"
 
     def _block_state_text(self, row, *, current: bool) -> tuple[str, QColor]:
         if current:
-            return "em edi\u00e7\u00e3o", color("focus_strong")
+            return "em edição", color("focus_strong")
         if row.block_prize_count > 0:
-            label = "1 pr\u00eamio" if row.block_prize_count == 1 else f"{row.block_prize_count} pr\u00eamios"
+            label = "1 prêmio" if row.block_prize_count == 1 else f"{row.block_prize_count} prêmios"
             return label, color("success_detail")
         if row.block_pendency_count > 0:
-            label = "1 pend\u00eancia" if row.block_pendency_count == 1 else f"{row.block_pendency_count} pend\u00eancias"
+            label = "1 pendência" if row.block_pendency_count == 1 else f"{row.block_pendency_count} pendências"
             return label, color("warning_detail")
         return "", color("text_muted")
 
@@ -563,8 +611,8 @@ class BetDelegate(QStyledItemDelegate):
         winner_count = sum(1 for line in page.lines if line.winners)
         parts = ["1 aposta" if len(valid_lines) == 1 else f"{len(valid_lines)} apostas"]
         if winner_count > 0:
-            parts.append("1 pr\u00eamio" if winner_count == 1 else f"{winner_count} pr\u00eamios")
-        return " \u2022 ".join(parts)
+            parts.append("1 prêmio" if winner_count == 1 else f"{winner_count} prêmios")
+        return " • ".join(parts)
 
     def _should_hide_page_total(self, row) -> bool:
         return row.valid_bet_count == 0 and row.right_text.strip() == "R$ 0,00"
@@ -576,7 +624,7 @@ class BetDelegate(QStyledItemDelegate):
         valid_lines = [line for line in page.lines if line.is_valid_bet]
         winner_count = sum(1 for line in page.lines if line.winners)
         if winner_count:
-            text = "1 pr\u00eamio" if winner_count == 1 else f"{winner_count} pr\u00eamios"
+            text = "1 prêmio" if winner_count == 1 else f"{winner_count} prêmios"
             return text, color("success_fg"), color("success_bg")
         if any(line.is_error for line in page.lines):
             return "Revisar", color("danger_fg"), color("danger_bg")
@@ -584,7 +632,7 @@ class BetDelegate(QStyledItemDelegate):
             return "Vazia", color("text_muted"), tinted("surface_alt", 210)
         if any(line.value is None for line in valid_lines):
             return "Pendente", color("warning_fg"), color("warning_bg")
-        return "Conclu\u00edda", color("success_fg"), color("success_bg")
+        return "Concluída", color("success_fg"), color("success_bg")
 
     def _summary_color(self, row) -> QColor:
         summary = normalized_text(row.right_text)
@@ -600,14 +648,6 @@ class BetDelegate(QStyledItemDelegate):
         number_text = " / ".join(spec.numbers) if spec.bet_type == BetType.FECHAMENTO else " ".join(spec.numbers)
         return spec.bet_type.value, number_text, [flag.value for flag in spec.flags]
 
-    def _badge_width(self, text: str, *, small: bool = False) -> int:
-        font = QFont()
-        font.setPointSizeF(6.6 if small else 7.5)
-        font.setBold(True)
-        metrics = QFontMetrics(font)
-        padding_x = 4 if small else 6
-        return metrics.horizontalAdvance(text) + (padding_x * 2)
-
     def _draw_badge(
         self,
         painter: QPainter,
@@ -620,19 +660,21 @@ class BetDelegate(QStyledItemDelegate):
         small: bool = False,
     ) -> int:
         font = QFont(painter.font())
-        font.setPointSizeF(6.6 if small else 7.5)
-        font.setBold(True)
+        font.setPointSizeF(_BADGE_FONT_SIZE_SMALL if small else _BADGE_FONT_SIZE)
+        font.setWeight(QFont.Weight.Bold)
         painter.setFont(font)
         metrics = QFontMetrics(font)
-        padding_x = 4 if small else 6
+        padding_x = 8 if not small else 6
         width = metrics.horizontalAdvance(text) + (padding_x * 2)
-        height = 13 if small else 16
+        height = _BADGE_HEIGHT_SMALL if small else _BADGE_HEIGHT
         badge_rect = QRectF(x, y, width, height)
-        border = QColor(fg)
-        border.setAlpha(44 if small else 58)
-        painter.setPen(QPen(border, 1))
+
+        # Solid fill — no border, clean pill
+        painter.setPen(Qt.PenStyle.NoPen)
         painter.setBrush(bg)
-        painter.drawRoundedRect(badge_rect, 7 if small else 8, 7 if small else 8)
+        painter.drawRoundedRect(badge_rect, _BADGE_RADIUS, _BADGE_RADIUS)
+
+        # Text
         painter.setPen(fg)
         painter.drawText(badge_rect, Qt.AlignmentFlag.AlignCenter, text)
         return int(badge_rect.right())

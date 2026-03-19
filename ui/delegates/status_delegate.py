@@ -29,58 +29,39 @@ def draw_status_indicator(
     emphasized: bool = False,
 ) -> QRectF:
     tone_color = status_tone_color(tone)
-    chip_width = min(40.0 if emphasized else 34.0, rect.width())
-    chip_height = min(24.0 if emphasized else 20.0, rect.height())
-    chip_rect = QRectF(
+    dot_size = 9.0 if emphasized else 7.0
+    indicator_area = QRectF(
         rect.left(),
-        rect.center().y() - (chip_height / 2),
-        chip_width,
-        chip_height,
+        rect.center().y() - (dot_size / 2),
+        dot_size + 8,
+        dot_size,
     )
 
-    shell_fill = QColor(color("surface_alt"))
-    shell_fill.setAlpha(78 if selected else 56)
-    shell_border = QColor(color("divider"))
-    shell_border.setAlpha(112 if selected else 72)
-    painter.setPen(QPen(shell_border, 1))
-    painter.setBrush(shell_fill)
-    painter.drawRoundedRect(chip_rect, chip_height / 2, chip_height / 2)
-
-    halo_rect = QRectF(
-        chip_rect.left() + 6,
-        chip_rect.center().y() - 6,
-        12,
-        12,
+    # Outer ring (subtle)
+    ring_rect = QRectF(
+        rect.left() + 4,
+        rect.center().y() - (dot_size / 2) - 2,
+        dot_size + 4,
+        dot_size + 4,
     )
-    halo_fill = QColor(tone_color)
-    halo_fill.setAlpha(58 if selected else 34)
-    halo_border = QColor(tone_color)
-    halo_border.setAlpha(140 if selected else 112)
-    painter.setPen(QPen(halo_border, 1))
-    painter.setBrush(halo_fill)
-    painter.drawEllipse(halo_rect)
+    ring_color = QColor(tone_color)
+    ring_color.setAlpha(40 if selected else 24)
+    painter.setPen(Qt.PenStyle.NoPen)
+    painter.setBrush(ring_color)
+    painter.drawEllipse(ring_rect)
 
+    # Solid dot
     dot_rect = QRectF(
-        halo_rect.center().x() - 3.5,
-        halo_rect.center().y() - 3.5,
-        7,
-        7,
+        ring_rect.center().x() - dot_size / 2,
+        ring_rect.center().y() - dot_size / 2,
+        dot_size,
+        dot_size,
     )
     painter.setPen(Qt.PenStyle.NoPen)
     painter.setBrush(tone_color)
     painter.drawEllipse(dot_rect)
 
-    if selected or emphasized:
-        rail = QColor(tone_color)
-        rail.setAlpha(210 if selected else 162)
-        painter.setBrush(rail)
-        painter.drawRoundedRect(
-            QRectF(chip_rect.left() + 2, chip_rect.top() + 4, 2.4, chip_rect.height() - 8),
-            1.2,
-            1.2,
-        )
-
-    return chip_rect
+    return indicator_area
 
 
 class StatusDelegate(QStyledItemDelegate):

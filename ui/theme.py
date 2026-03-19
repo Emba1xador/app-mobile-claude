@@ -5,135 +5,137 @@ from PySide6.QtGui import QColor, QPalette
 
 from core.enums import BetType, Flag
 
+# ── Conferix Light — warm sand/beige base, amber accent, dark text ──
+
 COLOR_TOKENS = {
-    # ── Surfaces ──
-    "window_bg": "#0B1117",
-    "panel_bg": "#101821",
-    "surface_bg": "#131C25",
-    "surface_alt": "#1A2734",
-    "field_bg": "#13202A",
-    "field_hover": "#16232C",
-    "field_focus": "#182734",
-    "toolbar_bg": "#0E161D",
-    "footer_bg": "#0D141B",
-    # ── Borders ──
-    "border": "#1A2631",
-    "divider": "#22303C",
-    # ── Text ──
-    "title": "#F4F8FC",
-    "text": "#E3EBF4",
-    "text_muted": "#A0B0BF",
-    "text_subtle": "#7B8FA0",
-    "placeholder": "#748698",
-    # ── Interaction ──
-    "hover": "#1A2833",
-    "pressed": "#21313D",
-    "focus": "#4B96AE",
-    "focus_strong": "#73C4D5",
-    "selection": "#173644",
-    "accent": "#2B6E84",
-    "accent_hover": "#3E8FA8",
-    "accent_soft": "#1A3945",
+    # ── Surfaces — warm sand/beige ──
+    "window_bg": "#E8E0D4",
+    "panel_bg": "#F0E8DC",
+    "surface_bg": "#DED6CA",
+    "surface_alt": "#D4CCC0",
+    "field_bg": "#F6F0E6",
+    "field_hover": "#EDE6DA",
+    "field_focus": "#F6F0E6",
+    "toolbar_bg": "#F0E8DC",
+    "footer_bg": "#F0E8DC",
+    # ── Borders — warm, visible ──
+    "border": "#A89C88",
+    "divider": "#C0B8A4",
+    # ── Text — dark warm ──
+    "title": "#1C1810",
+    "text": "#3A3428",
+    "text_muted": "#7A7264",
+    "text_subtle": "#A09888",
+    "placeholder": "#B0A898",
+    # ── Interaction — amber accent ──
+    "hover": "#D8D0C4",
+    "pressed": "#CCC4B8",
+    "focus": "#C07818",
+    "focus_strong": "#A86810",
+    "selection": "#F0D8A8",
+    "accent": "#C07818",
+    "accent_hover": "#A86810",
+    "accent_soft": "#F0D8A8",
     # ── Semantic ──
-    "success_fg": "#EFFAF4",
-    "success_bg": "#234936",
-    "success_detail": "#62B189",
-    "warning_fg": "#FFF7E8",
-    "warning_bg": "#7A6130",
-    "warning_soft_bg": "#382C18",
-    "warning_detail": "#E1B660",
-    "danger_fg": "#FFF1F4",
-    "danger_bg": "#6E3542",
-    "danger_soft_bg": "#3A1F28",
-    "danger_detail": "#D17A88",
-    "info_fg": "#EAF4FF",
-    "info_bg": "#315B7A",
+    "success_fg": "#1A5C2C",
+    "success_bg": "#D4F0DC",
+    "success_detail": "#1A8C3C",
+    "warning_fg": "#6C4808",
+    "warning_bg": "#FCF0C8",
+    "warning_soft_bg": "#FDF6DC",
+    "warning_detail": "#A87C10",
+    "danger_fg": "#8C1C20",
+    "danger_bg": "#FCE0DC",
+    "danger_soft_bg": "#FDE8E4",
+    "danger_detail": "#CC3838",
+    "info_fg": "#1C3870",
+    "info_bg": "#D8E8FC",
     # ── Manual entry ──
-    "manual_bg": "#24384A",
-    "manual_border": "#3F6B8B",
-    "manual_fg": "#F0F7FD",
-    "manual_placeholder": "#8FA8BE",
+    "manual_bg": "#E8DCC8",
+    "manual_border": "#B8A880",
+    "manual_fg": "#1C1810",
+    "manual_placeholder": "#8C8068",
     # ── Result panel ──
-    "result_card_bg": "#121A22",
-    "result_card_border": "#1F2A35",
-    "result_prize": "#B9C8D6",
-    "result_value": "#F7FBFF",
-    "result_group": "#7F93A7",
+    "result_card_bg": "#DED6CA",
+    "result_card_border": "#D4CCBC",
+    "result_prize": "#7A7264",
+    "result_value": "#1C1810",
+    "result_group": "#A09888",
     # ── Summary ──
-    "summary_section_bg": "#18242E",
-    "summary_positive_bg": "#18271F",
-    "summary_positive_fg": "#EAFBF1",
-    "summary_negative_bg": "#1C2731",
-    "summary_negative_fg": "#E5EEF7",
-    "summary_detail": "#AAB8C5",
+    "summary_section_bg": "#DED6CA",
+    "summary_positive_bg": "#D4F0DC",
+    "summary_positive_fg": "#1A5C2C",
+    "summary_negative_bg": "#DED6CA",
+    "summary_negative_fg": "#3A3428",
+    "summary_detail": "#7A7264",
     # ── Pending panel ──
-    "pending_panel_bg": "#101820",
-    "pending_section_bg": "#25251D",
-    "pending_section_fg": "#FFF4DD",
-    "pending_item_bg": "#131B23",
-    "pending_item_fg": "#D8E4EF",
+    "pending_panel_bg": "#F0E8DC",
+    "pending_section_bg": "#FCF0C8",
+    "pending_section_fg": "#6C4808",
+    "pending_item_bg": "#DED6CA",
+    "pending_item_fg": "#3A3428",
     # ── Finance ──
-    "finance_header_bg": "#0E161C",
-    "finance_contact_bg": "#16212A",
-    "finance_row_even": "#10161B",
-    "finance_row_odd": "#10171C",
-    "finance_pending_even": "#11171C",
-    "finance_pending_odd": "#11181D",
-    "finance_winner_even": "#111916",
-    "finance_winner_odd": "#111A17",
-    "finance_received_bg": "#121B22",
-    "finance_received_missing_bg": "#10171C",
-    "finance_received_text": "#EEF6FC",
-    "finance_received_missing_text": "#8A9CAB",
+    "finance_header_bg": "#E8E0D4",
+    "finance_contact_bg": "#DED6CA",
+    "finance_row_even": "#F0E8DC",
+    "finance_row_odd": "#E8E0D4",
+    "finance_pending_even": "#E8E0D4",
+    "finance_pending_odd": "#DED6CA",
+    "finance_winner_even": "#D8F0DC",
+    "finance_winner_odd": "#D0ECD4",
+    "finance_received_bg": "#F6F0E6",
+    "finance_received_missing_bg": "#E8E0D4",
+    "finance_received_text": "#3A3428",
+    "finance_received_missing_text": "#A09888",
     # ── Bet rows ──
-    "winner_row": "#15231C",
-    "error_row": "#341F26",
-    "page_header_text": "#F3F7FB",
-    "page_total_text": "#E8EEF5",
-    "bet_text": "#E8EEF5",
-    "empty_text": "#7F8C99",
-    # ── Type badges ──
-    "badge_centena_fg": "#EAF4FF",
-    "badge_centena_bg": "#315B7A",
-    "badge_milhar_fg": "#EAFBF2",
-    "badge_milhar_bg": "#2E6B4A",
-    "badge_mc_fg": "#F4EDFF",
-    "badge_mc_bg": "#594A80",
-    "badge_dezena_fg": "#FFF8E7",
-    "badge_dezena_bg": "#8C6A2B",
-    "badge_duque_fg": "#FFF1E8",
-    "badge_duque_bg": "#9A5A2C",
-    "badge_terno_fg": "#FFF0EC",
-    "badge_terno_bg": "#7A3F35",
-    "badge_grupo_fg": "#F4FADF",
-    "badge_grupo_bg": "#556B2F",
-    "badge_terno_grupo_fg": "#E9FFFC",
-    "badge_terno_grupo_bg": "#2D7A74",
-    "badge_fechamento_fg": "#EDF5FF",
-    "badge_fechamento_bg": "#4A617A",
+    "winner_row": "#D4F0DC",
+    "error_row": "#FCE0DC",
+    "page_header_text": "#1C1810",
+    "page_total_text": "#3A3428",
+    "bet_text": "#3A3428",
+    "empty_text": "#A09888",
+    # ── Type badges — white text on vivid solid fills ──
+    "badge_centena_fg": "#FFFFFF",
+    "badge_centena_bg": "#3080B8",
+    "badge_milhar_fg": "#FFFFFF",
+    "badge_milhar_bg": "#208848",
+    "badge_mc_fg": "#FFFFFF",
+    "badge_mc_bg": "#7040A8",
+    "badge_dezena_fg": "#FFFFFF",
+    "badge_dezena_bg": "#B88020",
+    "badge_duque_fg": "#FFFFFF",
+    "badge_duque_bg": "#B86028",
+    "badge_terno_fg": "#FFFFFF",
+    "badge_terno_bg": "#B83838",
+    "badge_grupo_fg": "#FFFFFF",
+    "badge_grupo_bg": "#508818",
+    "badge_terno_grupo_fg": "#FFFFFF",
+    "badge_terno_grupo_bg": "#188080",
+    "badge_fechamento_fg": "#FFFFFF",
+    "badge_fechamento_bg": "#4060B0",
     # ── Flag badges ──
-    "flag_invertida_fg": "#F1ECFF",
-    "flag_invertida_bg": "#4A4B83",
-    "flag_de_fg": "#FFF7E8",
-    "flag_de_bg": "#8A6830",
-    "flag_dem_fg": "#FFF0F4",
-    "flag_dem_bg": "#77485A",
+    "flag_invertida_fg": "#FFFFFF",
+    "flag_invertida_bg": "#6040A0",
+    "flag_de_fg": "#FFFFFF",
+    "flag_de_bg": "#A87818",
+    "flag_dem_fg": "#FFFFFF",
+    "flag_dem_bg": "#B83050",
 }
 
 BLOCK_PALETTES = {
     False: {
-        "page_header": QColor(22, 33, 42, 102),
-        "page_total": QColor(18, 26, 34, 84),
-        "row_light": QColor(18, 27, 35, 54),
-        "row_dark": QColor(16, 24, 31, 32),
-        "empty": QColor(18, 27, 35, 18),
+        "page_header": QColor(0, 0, 0, 22),
+        "page_total": QColor(0, 0, 0, 16),
+        "row_light": QColor(0, 0, 0, 8),
+        "row_dark": QColor(0, 0, 0, 5),
+        "empty": QColor(0, 0, 0, 3),
     },
     True: {
-        "page_header": QColor(24, 36, 46, 102),
-        "page_total": QColor(20, 29, 37, 84),
-        "row_light": QColor(20, 30, 38, 54),
-        "row_dark": QColor(17, 26, 34, 32),
-        "empty": QColor(18, 27, 35, 18),
+        "page_header": QColor(0, 0, 0, 32),
+        "page_total": QColor(0, 0, 0, 22),
+        "row_light": QColor(0, 0, 0, 16),
+        "row_dark": QColor(0, 0, 0, 11),
+        "empty": QColor(0, 0, 0, 5),
     },
 }
 
@@ -152,9 +154,9 @@ def tinted(color_name: str, alpha: int) -> QColor:
     return with_alpha(color_name, alpha)
 
 
-SELECTION_FILL = QColor(45, 77, 87, 122)
-WINNER_FILL = QColor(28, 67, 45, 46)
-ERROR_FILL = QColor(74, 38, 48, 50)
+SELECTION_FILL = QColor(192, 120, 24, 40)
+WINNER_FILL = QColor(26, 140, 60, 35)
+ERROR_FILL = QColor(204, 56, 56, 30)
 
 TYPE_COLORS = {
     BetType.CENTENA: (color("badge_centena_fg"), color("badge_centena_bg")),
@@ -190,13 +192,14 @@ ACTION_COLORS = {
 
 QSS_COLORS = {
     **COLOR_TOKENS,
-    "selection_rgba": "rgba(45, 77, 87, 210)",
+    "selection_rgba": "rgba(192, 120, 24, 60)",
 }
 
 
 APP_QSS = """
 /* ═══════════════════════════════════════════════════
-   Conferix Theme — Consolidated
+   Conferix — Light Theme
+   Warm sand/beige, amber accent, dark text
    ═══════════════════════════════════════════════════ */
 
 /* ── Global ── */
@@ -207,88 +210,92 @@ QMainWindow {{
 
 QWidget {{
     color: {text};
-    background: transparent;
+    background: {window_bg};
     font-family: "Segoe UI Variable Text", "Segoe UI";
     font-size: 11.0pt;
     selection-background-color: {selection};
     selection-color: {title};
 }}
 
-QWidget#middlePanel,
-QScrollArea > QWidget > QWidget {{
+QWidget#middlePanel {{
+    background: transparent;
+    padding: 0 4px;
+}}
+
+QScrollArea > QWidget > QWidget,
+QGroupBox > QWidget,
+QSplitter > QWidget > QWidget {{
     background: transparent;
 }}
 
 /* ── Toolbar ── */
 
 QToolBar#mainToolbar {{
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #0E151A, stop:1 #0B1116);
-    border: 1px solid #16232D;
-    border-radius: 24px;
-    spacing: 8px;
-    padding: 10px 18px;
-    margin: 8px 12px 0 12px;
+    background: {panel_bg};
+    border: none;
+    border-bottom: 1px solid {border};
+    border-radius: 0;
+    spacing: 6px;
+    padding: 8px 16px;
+    margin: 0;
 }}
 
 QToolBar#mainToolbar::separator {{
     width: 1px;
-    margin: 8px 4px;
-    background: {border};
+    margin: 6px 4px;
+    background: {divider};
 }}
 
 QToolBar#mainToolbar QToolButton {{
-    min-height: 34px;
-    padding: 6px 14px;
-    border-radius: 13px;
-    font-size: 9.6pt;
-    font-weight: 650;
+    min-height: 30px;
+    padding: 4px 14px;
+    border-radius: 6px;
+    font-size: 9.4pt;
+    font-weight: 700;
 }}
 
 QToolBar#mainToolbar QToolButton[toolbarTone="menu"] {{
-    background: #111A21;
-    border: 1px solid #1F2E39;
-    color: #DDE8F0;
+    background: {surface_bg};
+    border: none;
+    color: {text};
     padding-right: 18px;
 }}
 
 QToolBar#mainToolbar QToolButton[toolbarTone="menu"]:hover {{
-    background: {hover};
-    border-color: {accent_hover};
+    background: {surface_alt};
 }}
 
 QToolBar#mainToolbar QToolButton[toolbarTone="quiet"] {{
     background: transparent;
-    border: 1px solid transparent;
-    color: #95A7B6;
+    border: none;
+    color: {text_muted};
 }}
 
 QToolBar#mainToolbar QToolButton[toolbarTone="quiet"]:hover {{
-    background: #121C24;
-    border: 1px solid #1D2D39;
-    color: #E3ECF4;
+    background: {surface_bg};
+    color: {text};
 }}
 
 QToolBar#mainToolbar QToolButton[toolbarTone="primary"] {{
     background: {accent_soft};
-    border: 1px solid #2F6175;
-    color: #F3F8FC;
+    border: none;
+    color: {focus_strong};
 }}
 
 QToolBar#mainToolbar QToolButton[toolbarTone="primary"]:hover {{
-    background: #285160;
-    border-color: {focus};
+    background: {accent};
+    color: {title};
 }}
 
 QToolBar#mainToolbar QToolButton[toolbarTone="accent"] {{
-    background: #2A5B6F;
-    border: 1px solid #4C8EAA;
-    color: #F5FBFF;
+    background: {accent};
+    border: none;
+    color: #FFFFFF;
     font-weight: 700;
 }}
 
 QToolBar#mainToolbar QToolButton[toolbarTone="accent"]:hover {{
-    background: #336777;
-    border-color: {focus};
+    background: {accent_hover};
 }}
 
 QToolBar#mainToolbar QToolButton::menu-indicator {{
@@ -300,20 +307,20 @@ QToolBar#mainToolbar QToolButton::menu-indicator {{
 /* ── Labels ── */
 
 QLabel[topTitle="true"] {{
-    font-size: 16.1pt;
+    font-size: 15.0pt;
     font-weight: 760;
     color: {title};
 }}
 
 QLabel[toolbarLabel="true"] {{
-    color: #8196A8;
+    color: {text_muted};
     font-size: 8.5pt;
     font-weight: 650;
     padding-right: 4px;
 }}
 
 QLabel[toolbarMeta="true"] {{
-    color: #7F92A2;
+    color: {text_subtle};
     font-size: 8.5pt;
     font-weight: 600;
 }}
@@ -322,10 +329,10 @@ QLabel[toolbarMeta="true"] {{
 
 QToolButton,
 QPushButton {{
-    background: #1E2730;
-    color: #EEF4FA;
-    border: 1px solid #30414F;
-    border-radius: 9px;
+    background: {surface_bg};
+    color: {text};
+    border: none;
+    border-radius: 8px;
     min-height: 26px;
     padding: 4px 12px;
     font-weight: 600;
@@ -333,21 +340,19 @@ QPushButton {{
 
 QToolButton:hover,
 QPushButton:hover {{
-    background: {hover};
-    border-color: {accent_hover};
+    background: {surface_alt};
+    color: {title};
 }}
 
 QToolButton:pressed,
 QPushButton:pressed {{
     background: {pressed};
-    border-color: {focus};
 }}
 
 QToolButton:disabled,
 QPushButton:disabled {{
     background: {panel_bg};
     color: {text_subtle};
-    border-color: {divider};
 }}
 
 QDialogButtonBox QPushButton {{
@@ -358,43 +363,52 @@ QDialogButtonBox QPushButton {{
 /* ── GroupBox / Panels ── */
 
 QGroupBox {{
-    font-size: 11.5pt;
-    font-weight: 700;
-    color: {title};
-    background: #0F161C;
-    border: 1px solid #16222B;
-    border-radius: 20px;
-    margin-top: 14px;
+    font-size: 9.0pt;
+    font-weight: 800;
+    color: {text_muted};
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    margin-top: 18px;
+    padding-top: 4px;
+    letter-spacing: 1px;
 }}
 
 QGroupBox::title {{
     subcontrol-origin: margin;
-    left: 16px;
+    left: 12px;
     padding: 0 4px;
-    font-size: 12.0pt;
-    font-weight: 700;
-    color: {title};
+    font-size: 9.0pt;
+    font-weight: 800;
+    color: {text_muted};
+    text-transform: uppercase;
 }}
 
 QGroupBox#launchPanel,
 QGroupBox#financePanel {{
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #111922, stop:1 #0D1319);
+    background: {panel_bg};
+    border: 1px solid {border};
+    border-radius: 10px;
 }}
 
 QGroupBox#resultPanel,
 QGroupBox#sessionOverviewPanel,
-QGroupBox#pendingPanel,
+QGroupBox#pendingPanel {{
+    background: transparent;
+}}
+
 QGroupBox#financeTotalsPanel {{
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #121B23, stop:1 #0F151C);
+    background: transparent;
+    margin-top: 6px;
 }}
 
 /* ── Tables ── */
 
 QTableView {{
-    background: {surface_bg};
-    alternate-background-color: {surface_bg};
-    border: 1px solid {border};
-    border-radius: 14px;
+    background: transparent;
+    alternate-background-color: transparent;
+    border: none;
+    border-radius: 8px;
     gridline-color: transparent;
     selection-background-color: {selection_rgba};
     selection-color: {title};
@@ -436,8 +450,8 @@ QComboBox,
 QAbstractSpinBox {{
     background: {field_bg};
     color: {text};
-    border: 1px solid {border};
-    border-radius: 9px;
+    border: 1px solid transparent;
+    border-radius: 8px;
     padding: 6px 9px;
     selection-background-color: {selection};
     selection-color: {title};
@@ -450,6 +464,7 @@ QPlainTextEdit:hover,
 QComboBox:hover,
 QAbstractSpinBox:hover {{
     background: {field_hover};
+    border-color: {divider};
 }}
 
 QLineEdit:focus,
@@ -469,7 +484,6 @@ QComboBox:disabled,
 QAbstractSpinBox:disabled {{
     background: {panel_bg};
     color: {text_subtle};
-    border-color: {divider};
 }}
 
 QComboBox {{
@@ -481,19 +495,20 @@ QComboBox::drop-down {{
     subcontrol-origin: padding;
     subcontrol-position: top right;
     width: 24px;
-    border-left: 1px solid {divider};
-    background: {surface_alt};
-    border-top-right-radius: 9px;
-    border-bottom-right-radius: 9px;
+    border: none;
+    background: {surface_bg};
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
 }}
 
 QComboBox QAbstractItemView,
 QMenu,
 QFileDialog QListView,
 QFileDialog QTreeView {{
-    background: {surface_bg};
+    background: {panel_bg};
     color: {text};
     border: 1px solid {border};
+    border-radius: 8px;
     selection-background-color: {selection};
     selection-color: {title};
     outline: 0;
@@ -502,52 +517,52 @@ QFileDialog QTreeView {{
 QAbstractSpinBox::up-button,
 QAbstractSpinBox::down-button {{
     width: 18px;
-    background: {surface_alt};
-    border-left: 1px solid {divider};
+    background: {surface_bg};
+    border: none;
 }}
 
 QAbstractSpinBox::up-button:hover,
 QAbstractSpinBox::down-button:hover {{
-    background: {hover};
+    background: {surface_alt};
 }}
 
 /* ── Search widget ── */
 
 QWidget#toolbarSearchWidget {{
-    background: #0E151B;
-    border: 1px solid #1A2832;
-    border-radius: 20px;
-    padding: 4px 8px 4px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
 }}
 
 QComboBox#toolbarBlockSearch {{
-    min-height: 40px;
-    min-width: 204px;
-    padding: 6px 44px 6px 14px;
-    background: #0C1318;
-    border: 1px solid #294255;
-    border-radius: 15px;
+    min-height: 34px;
+    min-width: 180px;
+    padding: 5px 36px 5px 12px;
+    background: {field_bg};
+    border: 1px solid transparent;
+    border-radius: 8px;
     color: {title};
-    font-size: 10.1pt;
+    font-size: 10.0pt;
     font-weight: 700;
 }}
 
 QComboBox#toolbarBlockSearch:hover {{
-    background: #111B22;
-    border-color: #3D6178;
+    background: {field_hover};
+    border-color: {divider};
 }}
 
 QComboBox#toolbarBlockSearch:focus {{
-    background: #12202A;
+    background: {field_focus};
     border: 1px solid {focus};
 }}
 
 QComboBox#toolbarBlockSearch::drop-down {{
-    width: 36px;
-    border-left: 1px solid #355569;
-    background: #14232D;
-    border-top-right-radius: 15px;
-    border-bottom-right-radius: 15px;
+    width: 28px;
+    border: none;
+    background: {surface_bg};
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
 }}
 
 QComboBox#toolbarBlockSearch QLineEdit {{
@@ -558,7 +573,7 @@ QComboBox#toolbarBlockSearch QLineEdit {{
 }}
 
 QComboBox#toolbarBlockSearch QAbstractItemView {{
-    background: {surface_bg};
+    background: {panel_bg};
     border: 1px solid {border};
     selection-background-color: {selection};
     selection-color: {title};
@@ -570,52 +585,49 @@ QToolButton#toolbarSearchClear {{
     min-height: 24px;
     max-height: 24px;
     padding: 0;
-    border-radius: 12px;
+    border-radius: 8px;
     background: transparent;
-    border: 1px solid transparent;
-    color: #91A4B5;
+    border: none;
+    color: {text_muted};
     font-size: 10.5pt;
     font-weight: 700;
 }}
 
 QToolButton#toolbarSearchClear:hover {{
-    background: #182631;
-    border-color: #315165;
+    background: {surface_bg};
     color: {title};
 }}
 
 /* ── Launch filters ── */
 
 QWidget#launchFiltersBar {{
-    background: #0F171D;
-    border: 1px solid #18252E;
-    border-radius: 16px;
-    padding: 4px 6px;
+    background: {window_bg};
+    border: none;
+    border-radius: 8px;
+    padding: 3px 4px;
 }}
 
 QToolButton[launchFilter="true"],
 QToolButton[launchCompact="true"] {{
-    min-height: 30px;
+    min-height: 28px;
     padding: 4px 12px;
-    border-radius: 12px;
+    border-radius: 8px;
     background: transparent;
-    border: 1px solid transparent;
-    color: #8EA1B2;
+    border: none;
+    color: {text_muted};
     font-size: 9.1pt;
     font-weight: 700;
 }}
 
 QToolButton[launchFilter="true"]:hover,
 QToolButton[launchCompact="true"]:hover {{
-    background: #131E27;
-    border: 1px solid #213240;
-    color: {title};
+    background: {surface_bg};
+    color: {text};
 }}
 
 QToolButton[launchFilter="true"]:checked,
 QToolButton[launchCompact="true"]:checked {{
-    background: #162631;
-    border: 1px solid #2D4D5F;
+    background: {surface_bg};
     color: {title};
 }}
 
@@ -627,19 +639,19 @@ QScrollArea {{
 }}
 
 QScrollBar:vertical {{
-    background: {panel_bg};
-    width: 12px;
-    margin: 4px 2px 4px 2px;
+    background: transparent;
+    width: 8px;
+    margin: 4px 1px 4px 1px;
 }}
 
 QScrollBar::handle:vertical {{
     background: {border};
     min-height: 24px;
-    border-radius: 6px;
+    border-radius: 4px;
 }}
 
 QScrollBar::handle:vertical:hover {{
-    background: {focus};
+    background: {text_subtle};
 }}
 
 QScrollBar::add-line:vertical,
@@ -651,19 +663,19 @@ QScrollBar::sub-page:vertical {{
 }}
 
 QScrollBar:horizontal {{
-    background: {panel_bg};
-    height: 12px;
-    margin: 2px 4px 2px 4px;
+    background: transparent;
+    height: 8px;
+    margin: 1px 4px 1px 4px;
 }}
 
 QScrollBar::handle:horizontal {{
     background: {border};
     min-width: 24px;
-    border-radius: 6px;
+    border-radius: 4px;
 }}
 
 QScrollBar::handle:horizontal:hover {{
-    background: {focus};
+    background: {text_subtle};
 }}
 
 QScrollBar::add-line:horizontal,
@@ -677,11 +689,15 @@ QScrollBar::sub-page:horizontal {{
 /* ── Splitter ── */
 
 QSplitter::handle {{
-    background: {window_bg};
+    background: {divider};
+    margin: 16px 2px;
+    border-radius: 1px;
+    max-width: 1px;
 }}
 
 QSplitter::handle:hover {{
     background: {accent};
+    max-width: 2px;
 }}
 
 /* ── Status bar ── */
@@ -696,141 +712,58 @@ QStatusBar::item {{
     border: none;
 }}
 
-/* ── Result panel ── */
-
-QGroupBox#resultPanel QFrame[resultRow="true"] {{
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid #1A2832;
-    border-radius: 0;
-}}
-
-QGroupBox#resultPanel QFrame[resultTopPrize="true"] {{
-    border-bottom: 1px solid #233848;
-}}
-
-QLabel[resultPrize="true"] {{
-    color: #8DA0B1;
-    font-size: 7.8pt;
-    font-weight: 700;
-    min-width: 66px;
-}}
-
-QLabel[resultValue="true"] {{
-    color: #F5FAFE;
-    font-size: 16.2pt;
-    font-weight: 780;
-}}
-
-QLabel[resultGroup="true"] {{
-    color: #738798;
-    font-size: 7.5pt;
-    font-weight: 620;
-    min-width: 76px;
-}}
-
 /* ── Summary panel ── */
 
 QWidget[summaryRow="true"][summaryKind="section"] {{
-    background: {summary_section_bg};
-    border: 1px solid {border};
-    border-radius: 9px;
+    background: {surface_bg};
+    border: none;
+    border-radius: 8px;
 }}
 
 /* ── Session overview ── */
 
 QToolButton[overviewTab="true"] {{
-    min-height: 30px;
-    padding: 5px 12px;
-    border-radius: 12px;
+    min-height: 28px;
+    padding: 4px 16px;
+    border-radius: 6px;
     background: transparent;
-    border: 1px solid transparent;
-    color: #8CA0B1;
-    font-size: 9.8pt;
+    border: 1px solid {divider};
+    color: {text_muted};
+    font-size: 9.2pt;
     font-weight: 700;
 }}
 
 QToolButton[overviewTab="true"]:checked {{
-    background: #15222C;
-    border: 1px solid #284253;
+    background: {surface_bg};
+    border: 1px solid {border};
     color: {title};
 }}
 
 QToolButton[overviewTab="true"]:hover {{
-    border-color: {accent_hover};
-}}
-
-QToolButton[overviewRow="true"] {{
-    text-align: left;
-    padding: 12px 10px;
-    border-radius: 14px;
-    font-size: 9.85pt;
-    border: 1px solid transparent;
-}}
-
-QToolButton[overviewRow="true"][overviewKind="block"] {{
-    background: transparent;
-    border-bottom: 1px solid #17252F;
-    color: #E8F1F8;
-}}
-
-QToolButton[overviewRow="true"][overviewKind="block"]:hover {{
-    background: rgba(22, 35, 45, 0.55);
-    border: 1px solid rgba(39, 66, 84, 0.72);
-}}
-
-QToolButton[overviewRow="true"][overviewKind="block"][overviewSelected="true"] {{
-    background: rgba(24, 40, 50, 0.85);
-    border: 1px solid #2B4C60;
-}}
-
-QWidget[overviewAwardedGroup="true"] {{
-    background: transparent;
-    border: 1px solid #15242C;
-    border-radius: 16px;
-    padding: 2px;
-}}
-
-QWidget[overviewAwardedGroup="true"][overviewSelected="true"] {{
-    border-color: #2C4B5D;
-}}
-
-QToolButton[overviewRow="true"][overviewKind="awarded"] {{
-    background: rgba(18, 30, 26, 0.42);
-    border: 1px solid rgba(54, 89, 74, 0.48);
-    color: #EEF8F1;
-    font-weight: 700;
-}}
-
-QToolButton[overviewRow="true"][overviewKind="awarded"]:hover {{
-    background: rgba(23, 37, 32, 0.66);
-    border-color: rgba(82, 133, 109, 0.64);
-}}
-
-QWidget[overviewDetails="true"] {{
-    background: transparent;
+    background: {surface_bg};
+    color: {text};
 }}
 
 QWidget[overviewDetailRow="true"] {{
-    background: rgba(17, 25, 31, 0.38);
-    border: 1px solid rgba(31, 49, 61, 0.54);
-    border-radius: 12px;
+    background: {surface_bg};
+    border: none;
+    border-radius: 8px;
 }}
 
 QLabel[overviewDetailBet="true"] {{
-    color: #F2F7FB;
+    color: {title};
     font-size: 9.35pt;
     font-weight: 720;
 }}
 
 QLabel[overviewDetailMeta="true"] {{
-    color: #91A5B5;
+    color: {text_muted};
     font-size: 8.45pt;
     font-weight: 620;
 }}
 
 QLabel[overviewDetailPrize="true"] {{
-    color: #7BC297;
+    color: {success_detail};
     font-size: 8.6pt;
     font-weight: 700;
 }}
@@ -838,104 +771,46 @@ QLabel[overviewDetailPrize="true"] {{
 QLabel[overviewEmpty="true"] {{
     color: {text_subtle};
     font-size: 10.0pt;
-    background: #0E151A;
-    border: 1px dashed #203140;
-    border-radius: 16px;
+    background: {surface_bg};
+    border: none;
+    border-radius: 8px;
     padding: 14px;
 }}
 
 /* ── Pendency panel ── */
 
-QGroupBox#pendingPanel QLabel[pendencySectionHeader="true"] {{
-    font-weight: 700;
-    font-size: 8.8pt;
-    padding: 2px 2px 0 2px;
-}}
-
-QGroupBox#pendingPanel QLabel[pendencySectionHeader="true"][pendencyTone="critical"] {{
-    color: {warning_detail};
-}}
-
-QGroupBox#pendingPanel QLabel[pendencySectionHeader="true"][pendencyTone="warning"] {{
-    color: {text_muted};
-}}
-
-QWidget[pendencyGroup="true"] {{
-    background: transparent;
-    border: 1px solid transparent;
-    border-radius: 14px;
-}}
-
-QWidget[pendencyGroup="true"][pendencyTone="critical"] {{
-    background: rgba(46, 35, 24, 0.24);
-    border: 1px solid rgba(138, 108, 58, 0.46);
-}}
-
-QWidget[pendencyGroup="true"][pendencyTone="warning"] {{
-    background: rgba(26, 32, 37, 0.22);
-    border: 1px solid rgba(56, 78, 92, 0.44);
-}}
-
-QWidget[pendencyGroup="true"][pendencyExpanded="true"][pendencyTone="critical"] {{
-    background: rgba(50, 38, 25, 0.34);
-}}
-
-QWidget[pendencyGroup="true"][pendencyExpanded="true"][pendencyTone="warning"] {{
-    background: rgba(24, 32, 39, 0.34);
-}}
-
-QToolButton[pendencySummaryButton="true"] {{
-    text-align: left;
-    padding: 7px 10px;
-    border: none;
-    border-radius: 12px;
-    font-size: 9.55pt;
-    font-weight: 700;
-    background: transparent;
-}}
-
-QToolButton[pendencySummaryButton="true"][pendencyExpanded="true"] {{
-    background: rgba(255, 255, 255, 0.02);
-}}
-
-QToolButton[pendencySummaryButton="true"][pendencyTone="critical"] {{
-    color: #F4EDDD;
-}}
-
-QToolButton[pendencySummaryButton="true"][pendencyTone="warning"] {{
-    color: #DDE8F1;
-}}
-
-QToolButton[pendencySummaryButton="true"]:hover {{
-    background: rgba(115, 196, 213, 0.045);
-}}
-
 QWidget[pendencyDetails="true"] {{
     background: transparent;
-    border-top: 1px solid rgba(33, 49, 59, 0.55);
+    border: none;
 }}
 
 QLabel[pendencyDetail="true"] {{
-    color: #D1C6A9;
-    line-height: 1.3;
-    font-size: 8.7pt;
+    color: {warning_detail};
+    line-height: 1.4;
+    font-size: 9.0pt;
+    font-weight: 600;
+    padding: 2px 0;
+}}
+
+QLabel[pendencyDetail="true"][pendencyTone="warning"] {{
+    color: {text_muted};
 }}
 
 QLabel[pendencyEmpty="true"] {{
     color: {text_subtle};
     font-size: 10.0pt;
-    border: 1px dashed #223543;
-    border-radius: 14px;
-    background: #111922;
+    border: none;
+    border-radius: 8px;
+    background: {surface_bg};
     padding: 14px;
 }}
 
 /* ── Finance table ── */
 
 QTableView#financeTable {{
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #0F171D, stop:1 #0C1217);
-    border: 1px solid #16242D;
-    border-radius: 18px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
     padding: 4px 0 4px 0;
     selection-background-color: transparent;
 }}
@@ -946,15 +821,15 @@ QTableView#financeTable::item {{
 }}
 
 QTableView#financeTable:focus {{
-    border: 1px solid #2A5062;
+    border: 1px solid {focus};
 }}
 
 /* ── Finance totals panel ── */
 
 QWidget[totalsMetricsGroup="true"] {{
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #101820, stop:1 #0E151B);
-    border: 1px solid #192833;
-    border-radius: 16px;
+    background: {surface_bg};
+    border: none;
+    border-radius: 8px;
 }}
 
 QWidget[totalsMetricRow="true"] {{
@@ -965,30 +840,30 @@ QWidget[totalsMetricRow="true"] {{
 }}
 
 QLabel[totalsMetricLabel="true"] {{
-    color: #8DA0B1;
+    color: {text_muted};
     font-weight: 620;
     font-size: 8.7pt;
 }}
 
 QLabel[totalsMetricValue="true"] {{
-    color: #F4F9FD;
+    color: {title};
     font-weight: 760;
     font-size: 12.3pt;
 }}
 
 QLineEdit[totalsPaidInput="true"] {{
-    background: #0F171C;
-    border: 1px solid #1E2D38;
-    border-radius: 12px;
+    background: {field_bg};
+    border: 1px solid transparent;
+    border-radius: 8px;
     padding: 6px 10px;
-    color: #F2F8FD;
+    color: {title};
     font-weight: 740;
 }}
 
 QGroupBox#financeTotalsPanel QLineEdit {{
-    background: #0D151B;
-    border: 1px solid #21313D;
-    border-radius: 12px;
+    background: {field_bg};
+    border: 1px solid transparent;
+    border-radius: 8px;
     min-height: 32px;
 }}
 
@@ -997,37 +872,38 @@ QGroupBox#financeTotalsPanel QLineEdit:focus {{
 }}
 
 QFrame#financeTotalsDivider {{
-    color: #17242D;
-    background: #17242D;
+    color: {border};
+    background: {border};
     min-height: 1px;
     max-height: 1px;
     margin: 2px 8px 4px 8px;
 }}
 
 QWidget[totalsBalanceCard="true"] {{
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #15212B, stop:1 #101821);
-    border: 1px solid #25384A;
-    border-radius: 18px;
+    background: {surface_bg};
+    border: none;
+    border-radius: 8px;
+    max-height: 66px;
 }}
 
 QLabel[totalsBalanceLabel="true"] {{
-    color: #8FA3B4;
+    color: {text_muted};
     font-weight: 700;
     font-size: 8.4pt;
 }}
 
 QGroupBox#financeTotalsPanel QLabel[totalsResult="true"] {{
-    font-size: 23.0pt;
-    font-weight: 820;
+    font-size: 17.0pt;
+    font-weight: 800;
     qproperty-alignment: AlignRight;
 }}
 
 QGroupBox#financeTotalsPanel QLabel[totalsResult="true"][cashTone="positive"] {{
-    color: #58A97D;
+    color: {success_detail};
 }}
 
 QGroupBox#financeTotalsPanel QLabel[totalsResult="true"][cashTone="negative"] {{
-    color: #C66A78;
+    color: {danger_detail};
 }}
 
 QGroupBox#financeTotalsPanel QLabel[totalsResult="true"][cashTone="neutral"] {{
@@ -1050,31 +926,32 @@ QWidget[totalsNotesGroup="true"] {{
 }}
 
 QPlainTextEdit#sessionNotes {{
-    background: #0F171C;
-    border: 1px solid #192833;
-    color: #DDE7F0;
-    border-radius: 14px;
+    background: {field_bg};
+    border: 1px solid transparent;
+    color: {text};
+    border-radius: 8px;
     padding: 9px 10px;
-    placeholder-text-color: #5F7283;
+    placeholder-text-color: {placeholder};
 }}
 
 QPlainTextEdit#sessionNotes:focus {{
-    border: 1px solid #335D72;
+    border: 1px solid {focus};
 }}
 
 /* ── Bottom bar ── */
 
 QWidget#bottomBar {{
-    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0E151B, stop:0.45 #101821, stop:1 #0D141A);
-    border: 1px solid #16232C;
-    border-radius: 18px;
+    background: {window_bg};
+    border: none;
+    border-top: 1px solid {border};
+    border-radius: 0;
     padding: 2px 6px;
 }}
 
 QWidget[bottomZone="context"] {{
-    background: rgba(18, 28, 35, 0.7);
-    border: 1px solid rgba(31, 48, 60, 0.88);
-    border-radius: 14px;
+    background: {surface_bg};
+    border: none;
+    border-radius: 8px;
     padding: 0 10px;
 }}
 
@@ -1086,25 +963,25 @@ QWidget[bottomMetricsGroup="true"] {{
 }}
 
 QLabel[bottomContext="true"] {{
-    color: #F2F8FC;
+    color: {title};
     font-weight: 760;
     font-size: 10.6pt;
 }}
 
 QLabel[bottomInlineLabel="true"] {{
-    color: #7F93A4;
+    color: {text_muted};
     font-weight: 620;
     font-size: 8.25pt;
 }}
 
 QLabel[bottomInlineValue="true"] {{
-    color: #DDE8F0;
+    color: {text};
     font-weight: 640;
     font-size: 9.45pt;
 }}
 
 QLabel[bottomInlineValueStrong="true"] {{
-    color: #F5FAFE;
+    color: {title};
     font-weight: 780;
     font-size: 12.0pt;
 }}
@@ -1122,13 +999,13 @@ QLabel[bottomInlineValueStrong="true"][saldoTone="neutral"] {{
 }}
 
 QComboBox#bottomBlockSelector {{
-    background: #10181E;
-    border: 1px solid #1E303B;
+    background: {field_bg};
+    border: 1px solid transparent;
     min-height: 30px;
     padding: 3px 30px 3px 12px;
     font-weight: 700;
-    border-radius: 12px;
-    color: #DDE8F0;
+    border-radius: 8px;
+    color: {text};
 }}
 
 QComboBox#bottomBlockSelector::drop-down {{
@@ -1138,8 +1015,8 @@ QComboBox#bottomBlockSelector::drop-down {{
 
 QComboBox#bottomBlockSelector:hover,
 QComboBox#bottomBlockSelector:focus {{
-    background: #111B22;
-    border-color: #294050;
+    background: {field_hover};
+    border-color: {divider};
     color: {title};
 }}
 
@@ -1151,7 +1028,7 @@ QFrame[bottomSeparator="true"] {{
 }}
 
 QLabel[bottomHint="true"] {{
-    color: #6F8393;
+    color: {text_subtle};
     font-size: 8.0pt;
     font-weight: 560;
 }}
@@ -1173,8 +1050,8 @@ QFileDialog QLabel {{
 QMenu {{
     background: {panel_bg};
     border: 1px solid {border};
-    border-radius: 12px;
-    padding: 8px;
+    border-radius: 8px;
+    padding: 6px;
 }}
 
 QMenu::item {{
@@ -1184,7 +1061,7 @@ QMenu::item {{
 }}
 
 QMenu::item:selected {{
-    background: {surface_alt};
+    background: {surface_bg};
     color: {title};
 }}
 
@@ -1195,7 +1072,7 @@ QMenu::item:disabled {{
 QMenu::separator {{
     height: 1px;
     background: {divider};
-    margin: 6px 10px;
+    margin: 4px 8px;
 }}
 
 QFileDialog QFrame,
@@ -1204,11 +1081,11 @@ QMessageBox QFrame {{
 }}
 
 QToolTip {{
-    background: {surface_alt};
-    color: {text};
-    border: 1px solid {border};
+    background: {title};
+    color: {panel_bg};
+    border: none;
     padding: 6px 8px;
-    border-radius: 10px;
+    border-radius: 8px;
 }}
 """.format(**QSS_COLORS)
 
@@ -1219,8 +1096,8 @@ def build_app_palette() -> QPalette:
     palette.setColor(QPalette.ColorRole.WindowText, color("text"))
     palette.setColor(QPalette.ColorRole.Base, color("field_bg"))
     palette.setColor(QPalette.ColorRole.AlternateBase, color("surface_bg"))
-    palette.setColor(QPalette.ColorRole.ToolTipBase, color("surface_alt"))
-    palette.setColor(QPalette.ColorRole.ToolTipText, color("text"))
+    palette.setColor(QPalette.ColorRole.ToolTipBase, color("title"))
+    palette.setColor(QPalette.ColorRole.ToolTipText, color("panel_bg"))
     palette.setColor(QPalette.ColorRole.Text, color("text"))
     palette.setColor(QPalette.ColorRole.Button, color("surface_bg"))
     palette.setColor(QPalette.ColorRole.ButtonText, color("text"))
