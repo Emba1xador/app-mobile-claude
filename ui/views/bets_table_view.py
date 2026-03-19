@@ -125,11 +125,13 @@ class BetsTableView(QTableView):
         if index.isValid():
             row = self.model().row_at(index.row())
             if row.row_type == RowType.BLOCK_HEADER:
-                self.model().toggle_block_expansion(row.block_id)
-                header_row = self.model().block_header_row(row.block_id)
+                block_id = row.block_id
+                self.model().toggle_block_expansion(block_id)
+                header_row = self.model().block_header_row(block_id)
                 if header_row is not None:
-                    self.setCurrentIndex(self.model().index(header_row, 0))
-                    self.scrollTo(self.model().index(header_row, 0))
+                    header_index = self.model().index(header_row, 0)
+                    self.setCurrentIndex(header_index)
+                    QTimer.singleShot(0, lambda idx=header_index: self.scrollTo(idx, QAbstractItemView.ScrollHint.PositionAtTop))
                 event.accept()
                 return
             if row.row_type == RowType.PAGE_HEADER:
@@ -175,7 +177,13 @@ class BetsTableView(QTableView):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter) and self.state() != QAbstractItemView.EditingState:
             row = self.model().row_at(index.row())
             if row.row_type == RowType.BLOCK_HEADER:
-                self.model().toggle_block_expansion(row.block_id)
+                block_id = row.block_id
+                self.model().toggle_block_expansion(block_id)
+                header_row = self.model().block_header_row(block_id)
+                if header_row is not None:
+                    header_index = self.model().index(header_row, 0)
+                    self.setCurrentIndex(header_index)
+                    QTimer.singleShot(0, lambda idx=header_index: self.scrollTo(idx, QAbstractItemView.ScrollHint.PositionAtTop))
                 return True
             if row.row_type == RowType.PAGE_HEADER:
                 self.focus_page_action(row.page_id)
@@ -575,7 +583,13 @@ class BetsTableView(QTableView):
             self.focus_page_action(row.page_id)
             return
         if row.row_type == RowType.BLOCK_HEADER:
-            self.model().toggle_block_expansion(row.block_id)
+            block_id = row.block_id
+            self.model().toggle_block_expansion(block_id)
+            header_row = self.model().block_header_row(block_id)
+            if header_row is not None:
+                header_index = self.model().index(header_row, 0)
+                self.setCurrentIndex(header_index)
+                QTimer.singleShot(0, lambda idx=header_index: self.scrollTo(idx, QAbstractItemView.ScrollHint.PositionAtTop))
             return
         if index.column() == 1 and row.is_trailing_blank:
             target_row = self._next_editable_row(index.row(), column=1)

@@ -56,11 +56,11 @@ class PendencyHeaderWidget(QWidget):
         # Subtle bg on hover
         if self._hovered:
             painter.setPen(Qt.PenStyle.NoPen)
-            painter.setBrush(QColor(0, 0, 0, 8))
+            painter.setBrush(QColor(255, 255, 255, 10))
             painter.drawRoundedRect(rect, 4, 4)
 
         # Left accent bar — amber for critical, muted for normal
-        bar_color = QColor(192, 130, 16) if is_critical else QColor(160, 152, 136)
+        bar_color = QColor(212, 150, 20) if is_critical else QColor(102, 104, 112)
         bar_rect = QRectF(rect.left() + 4, rect.top() + 8, 3, rect.height() - 16)
         painter.setPen(Qt.PenStyle.NoPen)
         painter.setBrush(bar_color)
@@ -71,7 +71,7 @@ class PendencyHeaderWidget(QWidget):
         arrow_font.setPointSizeF(7.5)
         arrow_font.setBold(True)
         painter.setFont(arrow_font)
-        arrow_color = QColor(192, 130, 16) if is_critical else QColor(122, 114, 100)
+        arrow_color = QColor(212, 150, 20) if is_critical else QColor(138, 136, 128)
         painter.setPen(arrow_color)
         arrow_rect = QRectF(rect.left() + 14, rect.top(), 14, rect.height())
         painter.drawText(arrow_rect, Qt.AlignmentFlag.AlignCenter, "\u25be" if self._expanded else "\u25b8")
@@ -81,13 +81,13 @@ class PendencyHeaderWidget(QWidget):
         font.setPointSizeF(9.3)
         font.setWeight(QFont.Weight.DemiBold)
         painter.setFont(font)
-        text_color = QColor(108, 72, 8) if is_critical else QColor(58, 52, 40)
+        text_color = QColor(240, 160, 48) if is_critical else QColor(208, 204, 196)
         painter.setPen(text_color)
         text_rect = QRectF(rect.left() + 30, rect.top(), rect.width() - 38, rect.height())
         painter.drawText(text_rect, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, self.text)
 
         # Bottom separator
-        painter.setPen(QPen(QColor(0, 0, 0, 12), 0.5))
+        painter.setPen(QPen(QColor(255, 255, 255, 16), 0.5))
         painter.drawLine(int(rect.left()) + 10, int(rect.bottom()), int(rect.right()) - 6, int(rect.bottom()))
 
         painter.end()

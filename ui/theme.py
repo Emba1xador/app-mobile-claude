@@ -5,95 +5,95 @@ from PySide6.QtGui import QColor, QPalette
 
 from core.enums import BetType, Flag
 
-# ── Conferix Light — warm sand/beige base, amber accent, dark text ──
+# ── Conferix Slate — dark slate base, amber accent, light text ──
 
 COLOR_TOKENS = {
-    # ── Surfaces — warm sand/beige ──
-    "window_bg": "#E8E0D4",
-    "panel_bg": "#F0E8DC",
-    "surface_bg": "#DED6CA",
-    "surface_alt": "#D4CCC0",
-    "field_bg": "#F6F0E6",
-    "field_hover": "#EDE6DA",
-    "field_focus": "#F6F0E6",
-    "toolbar_bg": "#F0E8DC",
-    "footer_bg": "#F0E8DC",
-    # ── Borders — warm, visible ──
-    "border": "#A89C88",
-    "divider": "#C0B8A4",
-    # ── Text — dark warm ──
-    "title": "#1C1810",
-    "text": "#3A3428",
-    "text_muted": "#7A7264",
-    "text_subtle": "#A09888",
-    "placeholder": "#B0A898",
+    # ── Surfaces — dark slate ──
+    "window_bg": "#252830",
+    "panel_bg": "#2C303A",
+    "surface_bg": "#31353F",
+    "surface_alt": "#373B46",
+    "field_bg": "#1E2028",
+    "field_hover": "#24272F",
+    "field_focus": "#1E2028",
+    "toolbar_bg": "#2C303A",
+    "footer_bg": "#2C303A",
+    # ── Borders — slate, visible ──
+    "border": "#4A4E5A",
+    "divider": "#3D4150",
+    # ── Text — light warm ──
+    "title": "#E8E4DC",
+    "text": "#D0CCC4",
+    "text_muted": "#8A8880",
+    "text_subtle": "#666870",
+    "placeholder": "#555860",
     # ── Interaction — amber accent ──
-    "hover": "#D8D0C4",
-    "pressed": "#CCC4B8",
-    "focus": "#C07818",
-    "focus_strong": "#A86810",
-    "selection": "#F0D8A8",
+    "hover": "#3A3E4A",
+    "pressed": "#42464F",
+    "focus": "#D48A1C",
+    "focus_strong": "#D09028",
+    "selection": "#5A4010",
     "accent": "#C07818",
-    "accent_hover": "#A86810",
-    "accent_soft": "#F0D8A8",
+    "accent_hover": "#D48A1C",
+    "accent_soft": "#3A2C08",
     # ── Semantic ──
-    "success_fg": "#1A5C2C",
-    "success_bg": "#D4F0DC",
-    "success_detail": "#1A8C3C",
-    "warning_fg": "#6C4808",
-    "warning_bg": "#FCF0C8",
-    "warning_soft_bg": "#FDF6DC",
-    "warning_detail": "#A87C10",
-    "danger_fg": "#8C1C20",
-    "danger_bg": "#FCE0DC",
-    "danger_soft_bg": "#FDE8E4",
-    "danger_detail": "#CC3838",
-    "info_fg": "#1C3870",
-    "info_bg": "#D8E8FC",
+    "success_fg": "#50D080",
+    "success_bg": "#1A3028",
+    "success_detail": "#40C070",
+    "warning_fg": "#F0A030",
+    "warning_bg": "#2A2010",
+    "warning_soft_bg": "#221A08",
+    "warning_detail": "#E09028",
+    "danger_fg": "#F06870",
+    "danger_bg": "#3A1A1C",
+    "danger_soft_bg": "#2E1416",
+    "danger_detail": "#E05060",
+    "info_fg": "#60A0F0",
+    "info_bg": "#1A2840",
     # ── Manual entry ──
-    "manual_bg": "#E8DCC8",
-    "manual_border": "#B8A880",
-    "manual_fg": "#1C1810",
-    "manual_placeholder": "#8C8068",
+    "manual_bg": "#1E2028",
+    "manual_border": "#4A4E5A",
+    "manual_fg": "#D0CCC4",
+    "manual_placeholder": "#666870",
     # ── Result panel ──
-    "result_card_bg": "#DED6CA",
-    "result_card_border": "#D4CCBC",
-    "result_prize": "#7A7264",
-    "result_value": "#1C1810",
-    "result_group": "#A09888",
+    "result_card_bg": "#31353F",
+    "result_card_border": "#3D4150",
+    "result_prize": "#8A8880",
+    "result_value": "#E8E4DC",
+    "result_group": "#666870",
     # ── Summary ──
-    "summary_section_bg": "#DED6CA",
-    "summary_positive_bg": "#D4F0DC",
-    "summary_positive_fg": "#1A5C2C",
-    "summary_negative_bg": "#DED6CA",
-    "summary_negative_fg": "#3A3428",
-    "summary_detail": "#7A7264",
+    "summary_section_bg": "#31353F",
+    "summary_positive_bg": "#1A3028",
+    "summary_positive_fg": "#50D080",
+    "summary_negative_bg": "#31353F",
+    "summary_negative_fg": "#D0CCC4",
+    "summary_detail": "#8A8880",
     # ── Pending panel ──
-    "pending_panel_bg": "#F0E8DC",
-    "pending_section_bg": "#FCF0C8",
-    "pending_section_fg": "#6C4808",
-    "pending_item_bg": "#DED6CA",
-    "pending_item_fg": "#3A3428",
+    "pending_panel_bg": "#2C303A",
+    "pending_section_bg": "#2A2010",
+    "pending_section_fg": "#F0A030",
+    "pending_item_bg": "#31353F",
+    "pending_item_fg": "#D0CCC4",
     # ── Finance ──
-    "finance_header_bg": "#E8E0D4",
-    "finance_contact_bg": "#DED6CA",
-    "finance_row_even": "#F0E8DC",
-    "finance_row_odd": "#E8E0D4",
-    "finance_pending_even": "#E8E0D4",
-    "finance_pending_odd": "#DED6CA",
-    "finance_winner_even": "#D8F0DC",
-    "finance_winner_odd": "#D0ECD4",
-    "finance_received_bg": "#F6F0E6",
-    "finance_received_missing_bg": "#E8E0D4",
-    "finance_received_text": "#3A3428",
-    "finance_received_missing_text": "#A09888",
+    "finance_header_bg": "#252830",
+    "finance_contact_bg": "#31353F",
+    "finance_row_even": "#2C303A",
+    "finance_row_odd": "#31353F",
+    "finance_pending_even": "#2E2C38",
+    "finance_pending_odd": "#33303E",
+    "finance_winner_even": "#1A3028",
+    "finance_winner_odd": "#1E3830",
+    "finance_received_bg": "#1E2028",
+    "finance_received_missing_bg": "#2C303A",
+    "finance_received_text": "#D0CCC4",
+    "finance_received_missing_text": "#666870",
     # ── Bet rows ──
-    "winner_row": "#D4F0DC",
-    "error_row": "#FCE0DC",
-    "page_header_text": "#1C1810",
-    "page_total_text": "#3A3428",
-    "bet_text": "#3A3428",
-    "empty_text": "#A09888",
+    "winner_row": "#1A3028",
+    "error_row": "#3A1A1C",
+    "page_header_text": "#E8E4DC",
+    "page_total_text": "#D0CCC4",
+    "bet_text": "#D0CCC4",
+    "empty_text": "#555860",
     # ── Type badges — white text on vivid solid fills ──
     "badge_centena_fg": "#FFFFFF",
     "badge_centena_bg": "#3080B8",
@@ -124,18 +124,18 @@ COLOR_TOKENS = {
 
 BLOCK_PALETTES = {
     False: {
-        "page_header": QColor(0, 0, 0, 22),
-        "page_total": QColor(0, 0, 0, 16),
-        "row_light": QColor(0, 0, 0, 8),
-        "row_dark": QColor(0, 0, 0, 5),
-        "empty": QColor(0, 0, 0, 3),
+        "page_header": QColor(255, 255, 255, 40),
+        "page_total": QColor(255, 255, 255, 28),
+        "row_light": QColor(255, 255, 255, 16),
+        "row_dark": QColor(255, 255, 255, 10),
+        "empty": QColor(255, 255, 255, 5),
     },
     True: {
-        "page_header": QColor(0, 0, 0, 32),
-        "page_total": QColor(0, 0, 0, 22),
-        "row_light": QColor(0, 0, 0, 16),
-        "row_dark": QColor(0, 0, 0, 11),
-        "empty": QColor(0, 0, 0, 5),
+        "page_header": QColor(255, 255, 255, 60),
+        "page_total": QColor(255, 255, 255, 45),
+        "row_light": QColor(255, 255, 255, 28),
+        "row_dark": QColor(255, 255, 255, 20),
+        "empty": QColor(255, 255, 255, 10),
     },
 }
 
@@ -154,9 +154,9 @@ def tinted(color_name: str, alpha: int) -> QColor:
     return with_alpha(color_name, alpha)
 
 
-SELECTION_FILL = QColor(192, 120, 24, 40)
-WINNER_FILL = QColor(26, 140, 60, 35)
-ERROR_FILL = QColor(204, 56, 56, 30)
+SELECTION_FILL = QColor(212, 138, 28, 55)
+WINNER_FILL = QColor(60, 200, 100, 45)
+ERROR_FILL = QColor(224, 80, 80, 40)
 
 TYPE_COLORS = {
     BetType.CENTENA: (color("badge_centena_fg"), color("badge_centena_bg")),
@@ -192,14 +192,14 @@ ACTION_COLORS = {
 
 QSS_COLORS = {
     **COLOR_TOKENS,
-    "selection_rgba": "rgba(192, 120, 24, 60)",
+    "selection_rgba": "rgba(212, 138, 28, 70)",
 }
 
 
 APP_QSS = """
 /* ═══════════════════════════════════════════════════
-   Conferix — Light Theme
-   Warm sand/beige, amber accent, dark text
+   Conferix — Slate Theme
+   Dark slate base, amber accent, light text
    ═══════════════════════════════════════════════════ */
 
 /* ── Global ── */

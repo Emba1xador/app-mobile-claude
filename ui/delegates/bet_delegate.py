@@ -220,12 +220,12 @@ class BetDelegate(QStyledItemDelegate):
         )
         radius = 8.0
 
-        # Card fill — WHITE to stand out from beige window background
+        # Card fill — slightly lighter than window bg to stand out
         if current:
-            fill = QColor(255, 253, 248)  # warm white
+            fill = QColor(55, 60, 72)  # slate highlight
         else:
-            fill = QColor(248, 244, 236)  # off-white cream
-        border_clr = QColor(200, 192, 176)  # visible warm border
+            fill = QColor(45, 50, 62)  # slate card
+        border_clr = QColor(74, 78, 90)  # visible slate border
 
         # Build path with rounded corners only at top/bottom of block
         path = QPainterPath()
@@ -256,7 +256,7 @@ class BetDelegate(QStyledItemDelegate):
             shadow_rect = card_rect.adjusted(1, 1, 1, 0)
             shadow.addRoundedRect(shadow_rect, radius, radius)
             painter.setPen(Qt.PenStyle.NoPen)
-            painter.setBrush(QColor(0, 0, 0, 12))
+            painter.setBrush(QColor(0, 0, 0, 18))
             painter.drawPath(shadow)
 
         painter.setPen(QPen(border_clr, 1.0))
@@ -287,8 +287,8 @@ class BetDelegate(QStyledItemDelegate):
             rect.height() - (6 if not compact else 4),
         )
 
-        # ── Header zone — slightly darker within the block card ──
-        header_fill = QColor(0, 0, 0, 12) if current else QColor(0, 0, 0, 8)
+        # ── Header zone — slightly lighter within the block card ──
+        header_fill = QColor(255, 255, 255, 14) if current else QColor(255, 255, 255, 8)
         painter.setPen(Qt.PenStyle.NoPen)
         painter.setBrush(header_fill)
         painter.drawRoundedRect(card, 6, 6)
@@ -380,7 +380,7 @@ class BetDelegate(QStyledItemDelegate):
         # ── Separator line at top — divides pages within the card ──
         card_left = rect.left() + 4 + 12
         card_right = rect.right() - 4 - 12
-        painter.setPen(QPen(QColor(0, 0, 0, 28), 1.0))
+        painter.setPen(QPen(QColor(255, 255, 255, 28), 1.0))
         painter.drawLine(int(card_left), int(rect.top() + 2), int(card_right), int(rect.top() + 2))
 
         # ── Section bar ──
@@ -393,9 +393,9 @@ class BetDelegate(QStyledItemDelegate):
 
         # Background — subtle shading within the card
         if current:
-            bar_fill = QColor(0, 0, 0, 20)
+            bar_fill = QColor(255, 255, 255, 22)
         else:
-            bar_fill = QColor(0, 0, 0, 8)
+            bar_fill = QColor(255, 255, 255, 10)
         painter.setPen(Qt.PenStyle.NoPen)
         painter.setBrush(bar_fill)
         painter.drawRoundedRect(bar_rect, 5, 5)
@@ -454,15 +454,15 @@ class BetDelegate(QStyledItemDelegate):
         # ── Row background — ONLY for special states, minimal decoration ──
         if line.winners:
             painter.setPen(Qt.PenStyle.NoPen)
-            painter.setBrush(QColor(26, 140, 60, 30))
+            painter.setBrush(QColor(60, 200, 100, 45))
             painter.drawRoundedRect(content_rect, 6, 6)
         elif line.is_error:
             painter.setPen(Qt.PenStyle.NoPen)
-            painter.setBrush(QColor(204, 56, 56, 25))
+            painter.setBrush(QColor(224, 80, 80, 40))
             painter.drawRoundedRect(content_rect, 6, 6)
         elif active:
             painter.setPen(Qt.PenStyle.NoPen)
-            painter.setBrush(QColor(192, 120, 24, 25))
+            painter.setBrush(QColor(212, 138, 28, 50))
             painter.drawRoundedRect(content_rect, 6, 6)
 
         # ── Empty line = action row ──

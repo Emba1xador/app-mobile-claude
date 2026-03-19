@@ -397,6 +397,13 @@ class MainWindow(QMainWindow):
         self.launch_compact_button.toggled.connect(self._set_launch_compact_mode)
         launch_filters_layout.addWidget(self.launch_compact_button)
 
+        self.launch_collapse_all_button = QToolButton(launch_filters)
+        self.launch_collapse_all_button.setText("Minimizar")
+        self.launch_collapse_all_button.setProperty("launchCompact", True)
+        self.launch_collapse_all_button.setToolTip("Minimizar todos os blocos de uma vez.")
+        self.launch_collapse_all_button.clicked.connect(self._collapse_all_blocks)
+        launch_filters_layout.addWidget(self.launch_collapse_all_button)
+
         self.launch_filter_buttons["all"].setChecked(True)
         left_layout.addWidget(launch_filters)
         left_layout.addWidget(self.bets_view)
@@ -454,6 +461,9 @@ class MainWindow(QMainWindow):
 
     def _set_launch_compact_mode(self, enabled: bool) -> None:
         self.bets_view.set_compact_mode(enabled)
+
+    def _collapse_all_blocks(self) -> None:
+        self.bets_model.collapse_all_blocks()
 
     def _restore_launch_focus_after_filter(self) -> None:
         state = self.controller.state.ui_state
