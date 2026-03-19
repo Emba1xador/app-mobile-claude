@@ -50,6 +50,7 @@ def block_to_dict(block: Block) -> dict:
         "money_received": decimal_to_str(block.money_received),
         "whatsapp_phone": block.whatsapp_phone,
         "money_locked": block.money_locked,
+        "money_fiado": block.money_fiado,
     }
 
 
@@ -133,6 +134,7 @@ def dict_to_block(payload: dict) -> Block:
         money_received=Decimal(payload["money_received"]) if payload.get("money_received") is not None else None,
         whatsapp_phone=payload.get("whatsapp_phone"),
         money_locked=payload.get("money_locked", False),
+        money_fiado=payload.get("money_fiado", False),
     )
 
 

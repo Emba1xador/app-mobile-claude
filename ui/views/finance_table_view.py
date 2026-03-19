@@ -28,7 +28,7 @@ class FinanceHeaderView(QHeaderView):
         painter = QPainter(self.viewport())
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         painter.setRenderHint(QPainter.RenderHint.TextAntialiasing, True)
-        painter.fillRect(self.rect(), color("panel_bg"))
+        painter.fillRect(self.rect(), color("finance_header_bg"))
         model = self.model()
         if model is None:
             return
@@ -88,7 +88,20 @@ class FinanceTableView(QTableView):
 
     def setModel(self, model) -> None:  # noqa: N802
         super().setModel(model)
+        self.viewport().setMouseTracking(True)
         QTimer.singleShot(0, self._resize_columns_to_viewport)
+
+    def mouseMoveEvent(self, event) -> None:
+        index = self.indexAt(event.position().toPoint())
+        if index.isValid() and index.column() == FinanceTableModel.COL_RECEIVED:
+            self.viewport().setCursor(Qt.CursorShape.IBeamCursor)
+        else:
+            self.viewport().unsetCursor()
+        super().mouseMoveEvent(event)
+
+    def leaveEvent(self, event) -> None:
+        self.viewport().unsetCursor()
+        super().leaveEvent(event)
 
     def mousePressEvent(self, event) -> None:
         index = self.indexAt(event.position().toPoint())

@@ -21,6 +21,7 @@ class BetsTableView(QTableView):
     createPageRequested = Signal(str)
     deletePageRequested = Signal(str)
     deleteBlockRequested = Signal(str)
+    renameBlockRequested = Signal(str)   # block_id
     lockConflict = Signal(object, object)
 
     def __init__(self, controller, parent=None) -> None:
@@ -364,6 +365,8 @@ class BetsTableView(QTableView):
             self.deletePageRequested.emit(row.page_id)
         elif selected == actions["delete_block"]:
             self.deleteBlockRequested.emit(row.block_id)
+        elif selected == actions.get("rename_block"):
+            self.renameBlockRequested.emit(row.block_id)
         elif selected in transform_actions:
             self.transform_selection(transform_actions[selected])
         elif selected in flag_actions:
@@ -402,6 +405,8 @@ class BetsTableView(QTableView):
         }
         flags_menu.addSeparator()
         clear_flags_action = flags_menu.addAction("Limpar flags")
+        menu.addSeparator()
+        actions["rename_block"] = menu.addAction("Alterar número do bloco")
         menu.addSeparator()
         actions["delete_line"] = menu.addAction("Excluir linha")
         actions["delete_page"] = menu.addAction("Excluir página")

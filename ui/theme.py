@@ -55,6 +55,20 @@ COLOR_TOKENS = {
     "manual_border": "#4A4E5A",
     "manual_fg": "#D0CCC4",
     "manual_placeholder": "#666870",
+    # ── Column identity — Lançamentos (warm amber/brown, #5A4010 family) ──
+    "launch_panel_bg": "#232014",
+    "launch_panel_border": "#4A3A18",
+    "launch_title_color": "#C09040",
+    # ── Column identity — Financeiro (cool teal-slate) ──
+    "finance_panel_bg": "#1C2626",
+    "finance_panel_border": "#2A3E3E",
+    "finance_title_color": "#5C9090",
+    # ── Copy button (amber-highlighted) ──
+    "copy_btn_bg": "#3A2C08",
+    "copy_btn_fg": "#C07818",
+    "copy_btn_border": "#5A4010",
+    "copy_btn_hover_bg": "#4A3810",
+    "copy_btn_hover_fg": "#E09028",
     # ── Result panel ──
     "result_card_bg": "#31353F",
     "result_card_border": "#3D4150",
@@ -75,18 +89,21 @@ COLOR_TOKENS = {
     "pending_item_bg": "#31353F",
     "pending_item_fg": "#D0CCC4",
     # ── Finance ──
-    "finance_header_bg": "#252830",
-    "finance_contact_bg": "#31353F",
-    "finance_row_even": "#2C303A",
-    "finance_row_odd": "#31353F",
-    "finance_pending_even": "#2E2C38",
-    "finance_pending_odd": "#33303E",
+    "finance_header_bg": "#1C2626",
+    "finance_contact_bg": "#223232",
+    "finance_row_even": "#1E2A2A",
+    "finance_row_odd": "#223232",
+    "finance_pending_even": "#262634",
+    "finance_pending_odd": "#2C2C3A",
     "finance_winner_even": "#1A3028",
     "finance_winner_odd": "#1E3830",
-    "finance_received_bg": "#1E2028",
-    "finance_received_missing_bg": "#2C303A",
-    "finance_received_text": "#D0CCC4",
-    "finance_received_missing_text": "#666870",
+    "finance_received_bg": "#1A2E2E",
+    "finance_received_missing_bg": "#1C2626",
+    "finance_received_text": "#80D4D0",
+    "finance_received_missing_text": "#4A7070",
+    # ── Finance editable field affordance ──
+    "finance_editable_hint": "#2C4A4A",
+    "finance_editable_border": "#3A6060",
     # ── Bet rows ──
     "winner_row": "#1A3028",
     "error_row": "#3A1A1C",
@@ -123,19 +140,21 @@ COLOR_TOKENS = {
 }
 
 BLOCK_PALETTES = {
+    # Normal block — amber tints (#5A4010 family) for warm identity
     False: {
-        "page_header": QColor(255, 255, 255, 40),
-        "page_total": QColor(255, 255, 255, 28),
-        "row_light": QColor(255, 255, 255, 16),
-        "row_dark": QColor(255, 255, 255, 10),
-        "empty": QColor(255, 255, 255, 5),
+        "page_header": QColor(90, 64, 16, 70),    # amber wash on page headers
+        "page_total": QColor(90, 64, 16, 40),
+        "row_light": QColor(192, 120, 24, 14),    # faint amber on bet rows
+        "row_dark": QColor(192, 120, 24, 7),
+        "empty": QColor(255, 255, 255, 4),
     },
+    # Winner block — green family
     True: {
-        "page_header": QColor(255, 255, 255, 60),
-        "page_total": QColor(255, 255, 255, 45),
-        "row_light": QColor(255, 255, 255, 28),
-        "row_dark": QColor(255, 255, 255, 20),
-        "empty": QColor(255, 255, 255, 10),
+        "page_header": QColor(40, 200, 100, 70),
+        "page_total": QColor(40, 200, 100, 48),
+        "row_light": QColor(40, 200, 100, 28),
+        "row_dark": QColor(40, 200, 100, 18),
+        "empty": QColor(40, 200, 100, 8),
     },
 }
 
@@ -384,11 +403,28 @@ QGroupBox::title {{
     text-transform: uppercase;
 }}
 
-QGroupBox#launchPanel,
-QGroupBox#financePanel {{
-    background: {panel_bg};
-    border: 1px solid {border};
+/* ── Column identity — Lançamentos: warm amber family from #5A4010 ── */
+
+QGroupBox#launchPanel {{
+    background: {launch_panel_bg};
+    border: 1px solid {launch_panel_border};
     border-radius: 10px;
+}}
+
+QGroupBox#launchPanel::title {{
+    color: {launch_title_color};
+}}
+
+/* ── Column identity — Financeiro: cool teal-slate ── */
+
+QGroupBox#financePanel {{
+    background: {finance_panel_bg};
+    border: 1px solid {finance_panel_border};
+    border-radius: 10px;
+}}
+
+QGroupBox#financePanel::title {{
+    color: {finance_title_color};
 }}
 
 QGroupBox#resultPanel,
@@ -601,7 +637,7 @@ QToolButton#toolbarSearchClear:hover {{
 /* ── Launch filters ── */
 
 QWidget#launchFiltersBar {{
-    background: {window_bg};
+    background: transparent;
     border: none;
     border-radius: 8px;
     padding: 3px 4px;
@@ -621,14 +657,37 @@ QToolButton[launchCompact="true"] {{
 
 QToolButton[launchFilter="true"]:hover,
 QToolButton[launchCompact="true"]:hover {{
-    background: {surface_bg};
+    background: rgba(90, 64, 16, 0.35);
     color: {text};
 }}
 
 QToolButton[launchFilter="true"]:checked,
 QToolButton[launchCompact="true"]:checked {{
-    background: {surface_bg};
-    color: {title};
+    background: rgba(90, 64, 16, 0.50);
+    color: {launch_title_color};
+}}
+
+/* ── Copy button — amber-highlighted action ── */
+
+QToolButton[copyButton="true"] {{
+    background: {copy_btn_bg};
+    border: 1px solid {copy_btn_border};
+    border-radius: 6px;
+    color: {copy_btn_fg};
+    font-size: 8.6pt;
+    font-weight: 700;
+    padding: 3px 10px;
+    min-height: 22px;
+}}
+
+QToolButton[copyButton="true"]:hover {{
+    background: {copy_btn_hover_bg};
+    color: {copy_btn_hover_fg};
+    border-color: {accent};
+}}
+
+QToolButton[copyButton="true"]:pressed {{
+    background: {selection};
 }}
 
 /* ── Scrollbars ── */
@@ -821,79 +880,109 @@ QTableView#financeTable::item {{
 }}
 
 QTableView#financeTable:focus {{
-    border: 1px solid {focus};
+    border: 1px solid {finance_panel_border};
 }}
 
-/* ── Finance totals panel ── */
+/* ── Finance — Dinheiro column edit affordance ── */
 
-QWidget[totalsMetricsGroup="true"] {{
-    background: {surface_bg};
-    border: none;
-    border-radius: 8px;
+QTableView#financeTable QLineEdit {{
+    background: {finance_received_bg};
+    border: 1px solid {finance_editable_border};
+    border-radius: 6px;
+    color: {finance_received_text};
+    font-weight: 740;
+    padding: 3px 8px;
+}}
+
+QTableView#financeTable QLineEdit:focus {{
+    border: 1px solid {focus};
+    background: {finance_received_bg};
+}}
+
+/* ── Finance totals panel — unified compact card ── */
+
+QGroupBox#financeTotalsPanel {{
+    background: transparent;
+    margin-top: 4px;
+}}
+
+/* Unified summary+saldo card */
+QWidget[totalsUnifiedCard="true"] {{
+    background: {finance_contact_bg};
+    border: 1px solid {finance_panel_border};
+    border-radius: 10px;
+}}
+
+QWidget[totalsCardHeader="true"] {{
+    background: transparent;
+    border-bottom: 1px solid {finance_panel_border};
+    border-radius: 0;
+    padding: 6px 12px 6px 12px;
+}}
+
+QLabel[totalsCardTitle="true"] {{
+    color: {finance_title_color};
+    font-weight: 800;
+    font-size: 8.6pt;
+    letter-spacing: 0.5px;
 }}
 
 QWidget[totalsMetricRow="true"] {{
     background: transparent;
     border: none;
     border-radius: 0;
-    padding: 7px 12px;
+    padding: 5px 12px;
 }}
 
 QLabel[totalsMetricLabel="true"] {{
     color: {text_muted};
     font-weight: 620;
-    font-size: 8.7pt;
+    font-size: 8.5pt;
 }}
 
 QLabel[totalsMetricValue="true"] {{
     color: {title};
     font-weight: 760;
-    font-size: 12.3pt;
+    font-size: 11.4pt;
 }}
 
 QLineEdit[totalsPaidInput="true"] {{
-    background: {field_bg};
-    border: 1px solid transparent;
-    border-radius: 8px;
-    padding: 6px 10px;
-    color: {title};
-    font-weight: 740;
+    background: {finance_received_bg};
+    border: 1px solid {finance_editable_border};
+    border-radius: 6px;
+    padding: 3px 8px;
+    color: {finance_received_text};
+    font-weight: 720;
+    min-height: 22px;
 }}
 
-QGroupBox#financeTotalsPanel QLineEdit {{
-    background: {field_bg};
-    border: 1px solid transparent;
-    border-radius: 8px;
-    min-height: 32px;
-}}
-
-QGroupBox#financeTotalsPanel QLineEdit:focus {{
+QLineEdit[totalsPaidInput="true"]:focus {{
     border: 1px solid {focus};
 }}
 
 QFrame#financeTotalsDivider {{
-    color: {border};
-    background: {border};
+    color: {finance_panel_border};
+    background: {finance_panel_border};
     min-height: 1px;
     max-height: 1px;
-    margin: 2px 8px 4px 8px;
+    margin: 2px 8px;
 }}
 
-QWidget[totalsBalanceCard="true"] {{
-    background: {surface_bg};
+/* Saldo inline row */
+QWidget[totalsBalanceRow="true"] {{
+    background: transparent;
     border: none;
-    border-radius: 8px;
-    max-height: 66px;
+    padding: 6px 12px 8px 12px;
 }}
 
 QLabel[totalsBalanceLabel="true"] {{
     color: {text_muted};
-    font-weight: 700;
+    font-weight: 680;
     font-size: 8.4pt;
 }}
 
 QGroupBox#financeTotalsPanel QLabel[totalsResult="true"] {{
-    font-size: 17.0pt;
+    font-size: 15.0pt;
     font-weight: 800;
     qproperty-alignment: AlignRight;
 }}
@@ -1086,6 +1175,54 @@ QToolTip {{
     border: none;
     padding: 6px 8px;
     border-radius: 8px;
+}}
+
+/* ── BlockMoneyDialog — prompt compacto pós-criação de bloco ── */
+
+QWidget#blockMoneyCard {{
+    background: {panel_bg};
+    border: 1px solid {launch_panel_border};
+    border-radius: 12px;
+}}
+
+QLabel[blockMoneyHeader="true"] {{
+    color: {title};
+    font-size: 10.5pt;
+    font-weight: 700;
+}}
+
+QLabel[blockMoneyHint="true"] {{
+    color: {text_subtle};
+    font-size: 8.2pt;
+    font-weight: 500;
+}}
+
+QPushButton[blockMoneyConfirm="true"] {{
+    background: {accent_soft};
+    border: 1px solid {copy_btn_border};
+    border-radius: 7px;
+    color: {focus_strong};
+    font-weight: 700;
+    min-height: 28px;
+    padding: 4px 16px;
+}}
+
+QPushButton[blockMoneyConfirm="true"]:hover {{
+    background: {accent};
+    color: {title};
+}}
+
+QPushButton[blockMoneySkip="true"] {{
+    background: transparent;
+    border: none;
+    color: {text_muted};
+    font-weight: 600;
+    min-height: 28px;
+    padding: 4px 10px;
+}}
+
+QPushButton[blockMoneySkip="true"]:hover {{
+    color: {text};
 }}
 """.format(**QSS_COLORS)
 

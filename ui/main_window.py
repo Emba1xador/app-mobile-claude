@@ -49,6 +49,7 @@ from ui.delegates.bet_delegate import BetDelegate
 from ui.delegates.contact_delegate import ContactDelegate
 from ui.delegates.value_delegate import ValueDelegate
 from ui.dialogs.block_dialog import BlockDialog
+from ui.dialogs.block_money_dialog import BlockMoneyDialog
 from ui.dialogs.confirm_dialog import ask_confirmation
 from ui.dialogs.result_dialog import ResultDialog
 from ui.dialogs.session_name_dialog import SessionNameDialog
@@ -108,6 +109,7 @@ class MainWindow(QMainWindow):
         self.bets_view.lockConflict.connect(self.handle_locked_action)
         self.bets_view.deletePageRequested.connect(self.handle_delete_page)
         self.bets_view.deleteBlockRequested.connect(self.handle_delete_block)
+        self.bets_view.renameBlockRequested.connect(self.handle_rename_block)
 
         self.finance_view = FinanceTableView(self)
         self.finance_view.setObjectName("financeTable")
@@ -696,7 +698,48 @@ class MainWindow(QMainWindow):
             self._cleanup_previous_block_trailing_empty_page()
             block_id, page_id, _line_id = self.controller.create_block(dialog.value())
             self.handle_focus_block(block_id)
+            # Prompt compacto: quanto mandou?
+            self._prompt_block_money(block_id, dialog.value().zfill(3))
             self.bets_view.focus_page_entry(page_id, column=0, start_edit=True)
+        except Exception as exc:  # noqa: BLE001
+            self.show_error(str(exc))
+
+    def _prompt_block_money(self, block_id: str, block_number: str) -> None:
+        money_dialog = BlockMoneyDialog(block_number=block_number, parent=self)
+        # Posicionar próximo ao painel financeiro (canto inferior direito da janela)
+        money_dialog.adjustSize()
+        geo = self.geometry()
+        x = geo.right() - money_dialog.width() - 20
+        y = geo.bottom() - money_dialog.height() - 60
+        money_dialog.move(x, y)
+        if money_dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+        value_text = money_dialog.value()
+        if not value_text:
+            return
+        try:
+            self.controller.set_block_money(block_id, value_text)
+        except Exception as exc:  # noqa: BLE001
+            self.show_error(str(exc))
+
+    def handle_rename_block(self, block_id: str) -> None:
+        # Encontrar número atual do bloco para pré-preencher
+        block = next((b for b in self.controller.state.blocks if b.block_id == block_id), None)
+        if block is None:
+            return
+        dialog = ValueDialog(
+            "Alterar número do bloco",
+            "Novo número",
+            self,
+            description=f"Bloco atual: {block.number}\nDigite o novo número para este bloco.",
+        )
+        dialog.input.setText(block.number)
+        dialog.input.selectAll()
+        if dialog.exec() != QDialog.DialogCode.Accepted or not dialog.value():
+            return
+        try:
+            self.controller.rename_block(block_id, dialog.value())
+            self.bets_view.flash_block(block_id, duration_ms=600)
         except Exception as exc:  # noqa: BLE001
             self.show_error(str(exc))
 

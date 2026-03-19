@@ -66,4 +66,5 @@ def finance_row(block: Block, percentage: Decimal, has_winner: bool = False) -> 
         values_complete=values_complete,
         money_locked=block.money_locked,
         winner_count=winner_count(block),
+        money_fiado=block.money_fiado,
     )

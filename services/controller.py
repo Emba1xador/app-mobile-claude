@@ -319,11 +319,40 @@ class BancaController:
 
     def set_block_money(self, block_id: str, value_text: str, force_unlock: bool = False) -> None:
         block = self._get_block(block_id)
-        new_value = parse_money(value_text)
+        text = value_text.strip()
+        if text.upper() in {"F", "FIADO"}:
+            if block.money_locked and not force_unlock:
+                self._guard_block_mutation(block, force_unlock)
+            block.money_fiado = True
+            block.money_received = None
+            block.money_locked = True
+            self._recompute()
+            self.notify()
+            return
+        new_value = parse_money(text)
         if block.money_locked and block.money_received != new_value:
             self._guard_block_mutation(block, force_unlock)
+        block.money_fiado = False
         block.money_received = new_value
         block.money_locked = new_value is not None
+        self._recompute()
+        self.notify()
+
+    def rename_block(self, block_id: str, new_number: str) -> None:
+        normalized = new_number.strip().lstrip("0") or "0"
+        if not normalized.isdigit():
+            raise ValueError("Número do bloco inválido — use apenas dígitos.")
+        normalized = normalized.zfill(3)
+        block = self._get_block(block_id)
+        old_number = block.number
+        block.number = normalized
+        # Migrar contato WhatsApp se existia no mapa
+        if old_number in self.state.whatsapp_map:
+            phone = self.state.whatsapp_map.pop(old_number)
+            self.state.whatsapp_map[normalized] = phone
+            block.whatsapp_phone = phone
+        elif normalized in self.state.whatsapp_map:
+            block.whatsapp_phone = self.state.whatsapp_map[normalized]
         self._recompute()
         self.notify()
 

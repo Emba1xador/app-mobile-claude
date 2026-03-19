@@ -77,6 +77,7 @@ class Block:
     money_received: Decimal | None = None
     whatsapp_phone: str | None = None
     money_locked: bool = False
+    money_fiado: bool = False  # "a prazo/fiado" — sem valor numérico mas marcado
 
 
 @dataclass(slots=True)
@@ -113,6 +114,7 @@ class FinanceRow:
     values_complete: bool
     money_locked: bool
     winner_count: int = 0
+    money_fiado: bool = False
 
 
 @dataclass(slots=True)
