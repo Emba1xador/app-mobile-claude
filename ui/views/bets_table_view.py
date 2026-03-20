@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import logging
+
 from PySide6.QtCore import QEvent, QItemSelection, QItemSelectionModel, QModelIndex, QPoint, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QMouseEvent, QPainter, QPen, QShortcut
+from PySide6.QtGui import QColor, QMouseEvent, QPen, QShortcut
 from PySide6.QtWidgets import QAbstractItemDelegate, QAbstractItemView, QHeaderView, QMenu, QTableView
 
 from core.enums import BetType, CommitMode, Flag, RowType
@@ -11,12 +13,15 @@ from ui.delegates.bet_delegate import BetDelegate
 from ui.delegates.value_delegate import ValueDelegate
 from ui.theme import color, tinted
 
+LOGGER = logging.getLogger(__name__)
+
 
 class BetsTableView(QTableView):
     createBlockRequested = Signal()
     createPageRequested = Signal(str)
     deletePageRequested = Signal(str)
     deleteBlockRequested = Signal(str)
+    renameBlockRequested = Signal(str)   # block_id
     lockConflict = Signal(object, object)
 
     def __init__(self, controller, parent=None) -> None:
@@ -63,9 +68,6 @@ class BetsTableView(QTableView):
         self.resizeRowsToContents()
         self.doItemsLayout()
         self.viewport().update()
-
-    def drawRow(self, painter: QPainter, option, index) -> None:  # noqa: N802
-        super().drawRow(painter, option, index)
 
     def flash_block(self, block_id: str, duration_ms: int = 900) -> None:
         self._flash_block_id = block_id
@@ -125,11 +127,13 @@ class BetsTableView(QTableView):
         if index.isValid():
             row = self.model().row_at(index.row())
             if row.row_type == RowType.BLOCK_HEADER:
-                self.model().toggle_block_expansion(row.block_id)
-                header_row = self.model().block_header_row(row.block_id)
+                block_id = row.block_id
+                self.model().toggle_block_expansion(block_id)
+                header_row = self.model().block_header_row(block_id)
                 if header_row is not None:
-                    self.setCurrentIndex(self.model().index(header_row, 0))
-                    self.scrollTo(self.model().index(header_row, 0))
+                    header_index = self.model().index(header_row, 0)
+                    self.setCurrentIndex(header_index)
+                    QTimer.singleShot(0, lambda idx=header_index: self.scrollTo(idx, QAbstractItemView.ScrollHint.PositionAtTop))
                 event.accept()
                 return
             if row.row_type == RowType.PAGE_HEADER:
@@ -175,7 +179,13 @@ class BetsTableView(QTableView):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter) and self.state() != QAbstractItemView.EditingState:
             row = self.model().row_at(index.row())
             if row.row_type == RowType.BLOCK_HEADER:
-                self.model().toggle_block_expansion(row.block_id)
+                block_id = row.block_id
+                self.model().toggle_block_expansion(block_id)
+                header_row = self.model().block_header_row(block_id)
+                if header_row is not None:
+                    header_index = self.model().index(header_row, 0)
+                    self.setCurrentIndex(header_index)
+                    QTimer.singleShot(0, lambda idx=header_index: self.scrollTo(idx, QAbstractItemView.ScrollHint.PositionAtTop))
                 return True
             if row.row_type == RowType.PAGE_HEADER:
                 self.focus_page_action(row.page_id)
@@ -355,6 +365,8 @@ class BetsTableView(QTableView):
             self.deletePageRequested.emit(row.page_id)
         elif selected == actions["delete_block"]:
             self.deleteBlockRequested.emit(row.block_id)
+        elif selected == actions.get("rename_block"):
+            self.renameBlockRequested.emit(row.block_id)
         elif selected in transform_actions:
             self.transform_selection(transform_actions[selected])
         elif selected in flag_actions:
@@ -393,6 +405,8 @@ class BetsTableView(QTableView):
         }
         flags_menu.addSeparator()
         clear_flags_action = flags_menu.addAction("Limpar flags")
+        menu.addSeparator()
+        actions["rename_block"] = menu.addAction("Alterar número do bloco")
         menu.addSeparator()
         actions["delete_line"] = menu.addAction("Excluir linha")
         actions["delete_page"] = menu.addAction("Excluir página")
@@ -506,7 +520,7 @@ class BetsTableView(QTableView):
                 lambda: self._apply_flag_with_restore(line_ids, current_line_id, flag, mode, force_unlock=True),
             )
         except Exception:
-            pass
+            LOGGER.exception("Erro inesperado ao aplicar flag")
         else:
             if changed:
                 QTimer.singleShot(0, lambda: self._focus_next_line_after_flag(current_line_id))
@@ -522,7 +536,6 @@ class BetsTableView(QTableView):
             return
         flagged_text = self.controller.resolve_flag_input(editor.text(), flag, mode="toggle", commit_mode=CommitMode.ENTER)
         if not flagged_text:
-            editor.setText(editor.text())
             editor.end(False)
             return
         payload = {"text": flagged_text, "commit_mode": CommitMode.ENTER}
@@ -575,7 +588,13 @@ class BetsTableView(QTableView):
             self.focus_page_action(row.page_id)
             return
         if row.row_type == RowType.BLOCK_HEADER:
-            self.model().toggle_block_expansion(row.block_id)
+            block_id = row.block_id
+            self.model().toggle_block_expansion(block_id)
+            header_row = self.model().block_header_row(block_id)
+            if header_row is not None:
+                header_index = self.model().index(header_row, 0)
+                self.setCurrentIndex(header_index)
+                QTimer.singleShot(0, lambda idx=header_index: self.scrollTo(idx, QAbstractItemView.ScrollHint.PositionAtTop))
             return
         if index.column() == 1 and row.is_trailing_blank:
             target_row = self._next_editable_row(index.row(), column=1)

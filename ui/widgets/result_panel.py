@@ -29,11 +29,11 @@ class ResultRow(QWidget):
         rect = QRectF(self.rect())
         row_rect = QRectF(rect.left() + 4, rect.top() + 2, rect.width() - 8, rect.height() - 4)
 
-        # Clean background — warm light
+        # Clean background — slate overlay
         if self.is_first:
-            fill = QColor(0, 0, 0, 14)
+            fill = QColor(255, 255, 255, 12)
         else:
-            fill = QColor(0, 0, 0, 8)
+            fill = QColor(255, 255, 255, 7)
 
         painter.setPen(Qt.PenStyle.NoPen)
         painter.setBrush(fill)
@@ -47,7 +47,7 @@ class ResultRow(QWidget):
         prize_font.setPointSizeF(8.0)
         prize_font.setWeight(QFont.Weight.Bold)
         painter.setFont(prize_font)
-        painter.setPen(QColor(122, 114, 100))  # text_muted
+        painter.setPen(QColor(138, 136, 128))  # text_muted
         prize_text = f"{self.position}\u00ba prêmio"
         prize_w = QFontMetrics(prize_font).horizontalAdvance(prize_text) + 4
         prize_rect = QRectF(inner_left, row_rect.top(), prize_w, row_rect.height())
@@ -58,7 +58,7 @@ class ResultRow(QWidget):
         group_font.setPointSizeF(8.0)
         group_font.setWeight(QFont.Weight.DemiBold)
         painter.setFont(group_font)
-        painter.setPen(QColor(160, 152, 136))  # text_subtle
+        painter.setPen(QColor(102, 104, 112))  # text_subtle
         group_w = QFontMetrics(group_font).horizontalAdvance(self.group_text) + 4
         group_rect = QRectF(inner_right - group_w, row_rect.top(), group_w, row_rect.height())
         painter.drawText(group_rect, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter, self.group_text)
@@ -73,9 +73,9 @@ class ResultRow(QWidget):
         painter.setFont(value_font)
 
         if self.milhar == "\u2014":
-            painter.setPen(QColor(160, 152, 136, 120))
+            painter.setPen(QColor(102, 104, 112, 120))
         else:
-            painter.setPen(QColor(28, 24, 16))  # title
+            painter.setPen(QColor(232, 228, 220))  # title
 
         value_left = inner_left + prize_w + 8
         value_right = inner_right - group_w - 8

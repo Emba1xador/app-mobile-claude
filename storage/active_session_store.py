@@ -41,11 +41,15 @@ class ActiveSessionStore:
 
     def load(self) -> AppState:
         try:
-            payload = json.loads(self.path.read_text(encoding="utf-8"))
+            raw = self.path.read_text(encoding="utf-8")
+        except OSError as exc:
+            raise ValueError("Sessão ativa não encontrada.") from exc
+        try:
+            payload = json.loads(raw)
             return dict_to_app_state(payload)
-        except (OSError, json.JSONDecodeError, KeyError, TypeError) as exc:
-            LOGGER.warning("Falha ao carregar sessao ativa %s: %s", self.path, exc)
-            raise ValueError("A sessao ativa esta corrompida, invalida ou incompativel.") from exc
+        except (json.JSONDecodeError, KeyError, TypeError) as exc:
+            LOGGER.warning("Sessão ativa corrompida %s: %s", self.path, exc)
+            raise ValueError("A sessão ativa está corrompida, inválida ou incompatível.") from exc
 
     def try_load(self) -> AppState | None:
         if not self.exists():

@@ -3,6 +3,7 @@ from __future__ import annotations
 from PySide6.QtCore import QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPen
 from PySide6.QtWidgets import (
+    QApplication,
     QFrame,
     QGroupBox,
     QHBoxLayout,
@@ -62,9 +63,9 @@ class BlockRowWidget(QWidget):
 
         # Background — transparent by default, visible on select/hover
         if self.is_selected:
-            fill = QColor(192, 120, 24, 25)
+            fill = QColor(192, 120, 24, 40)
         elif self._hovered:
-            fill = QColor(0, 0, 0, 10)
+            fill = QColor(255, 255, 255, 12)
         else:
             fill = QColor(0, 0, 0, 0)
 
@@ -74,7 +75,7 @@ class BlockRowWidget(QWidget):
 
         # Bottom separator
         if not self.is_selected:
-            painter.setPen(QPen(QColor(0, 0, 0, 16), 0.5))
+            painter.setPen(QPen(QColor(255, 255, 255, 16), 0.5))
             painter.drawLine(row_rect.left() + 8, int(row_rect.bottom()), int(row_rect.right() - 8), int(row_rect.bottom()))
 
         # Text
@@ -82,7 +83,7 @@ class BlockRowWidget(QWidget):
         font.setPointSizeF(9.6)
         font.setWeight(QFont.Weight.DemiBold)
         painter.setFont(font)
-        painter.setPen(QColor(28, 24, 16) if self.is_selected else QColor(58, 52, 40))
+        painter.setPen(QColor(224, 220, 212) if self.is_selected else QColor(208, 204, 196))
         text_rect = row_rect.adjusted(10, 0, -8, 0)
         painter.drawText(text_rect, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, self.text)
 
@@ -134,13 +135,13 @@ class AwardedBlockWidget(QWidget):
         # Subtle bg on hover
         if self._hovered:
             painter.setPen(Qt.PenStyle.NoPen)
-            painter.setBrush(QColor(0, 0, 0, 8))
+            painter.setBrush(QColor(255, 255, 255, 10))
             painter.drawRoundedRect(row_rect, 4, 4)
 
         # Left accent bar — green
         bar_rect = QRectF(row_rect.left() + 4, row_rect.top() + 8, 3, row_rect.height() - 16)
         painter.setPen(Qt.PenStyle.NoPen)
-        painter.setBrush(QColor(26, 140, 60))
+        painter.setBrush(QColor(60, 200, 100))
         painter.drawRoundedRect(bar_rect, 1.5, 1.5)
 
         # Arrow — small triangle
@@ -148,7 +149,7 @@ class AwardedBlockWidget(QWidget):
         arrow_font.setPointSizeF(7.5)
         arrow_font.setBold(True)
         painter.setFont(arrow_font)
-        painter.setPen(QColor(26, 140, 60))
+        painter.setPen(QColor(60, 200, 100))
         arrow_rect = QRectF(row_rect.left() + 14, row_rect.top(), 14, row_rect.height())
         painter.drawText(arrow_rect, Qt.AlignmentFlag.AlignCenter, "\u25be" if self._expanded else "\u25b8")
 
@@ -157,12 +158,12 @@ class AwardedBlockWidget(QWidget):
         font.setPointSizeF(9.3)
         font.setWeight(QFont.Weight.DemiBold)
         painter.setFont(font)
-        painter.setPen(QColor(26, 92, 44))
+        painter.setPen(QColor(100, 220, 140))
         text_rect = QRectF(row_rect.left() + 30, row_rect.top(), row_rect.width() - 38, row_rect.height())
         painter.drawText(text_rect, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, self.text)
 
         # Bottom separator
-        painter.setPen(QPen(QColor(0, 0, 0, 12), 0.5))
+        painter.setPen(QPen(QColor(255, 255, 255, 12), 0.5))
         painter.drawLine(int(row_rect.left()) + 10, int(row_rect.bottom()), int(row_rect.right()) - 6, int(row_rect.bottom()))
 
         painter.end()
@@ -177,6 +178,7 @@ class SessionOverviewPanel(QGroupBox):
         self._result_loaded: bool | None = None
         self._selected_block_id = ""
         self._expanded_awarded_block_ids: set[str] = set()
+        self._current_awarded_blocks: list[dict] = []
 
         self.tab_buttons: list[QToolButton] = []
         self.tab_bar_widget = QWidget(self)
@@ -193,6 +195,14 @@ class SessionOverviewPanel(QGroupBox):
             tab_layout.addWidget(button)
             self.tab_buttons.append(button)
         tab_layout.addStretch(1)
+
+        self.copy_awarded_button = QToolButton(self.tab_bar_widget)
+        self.copy_awarded_button.setText("Copiar")
+        self.copy_awarded_button.setProperty("launchCompact", True)
+        self.copy_awarded_button.setToolTip("Copiar lista de premiados formatada para WhatsApp.")
+        self.copy_awarded_button.clicked.connect(self._copy_awarded_to_clipboard)
+        self.copy_awarded_button.setVisible(False)
+        tab_layout.addWidget(self.copy_awarded_button)
 
         self.stack = QStackedWidget(self)
         self.blocks_page, self.blocks_layout = self._build_page("overviewBlocksPage")
@@ -222,9 +232,10 @@ class SessionOverviewPanel(QGroupBox):
             self._set_tab(1)
         self._result_loaded = result_loaded
 
+        self._current_awarded_blocks = list(data.get("awarded_blocks", []))
         self._render_blocks(list(data.get("blocks", [])))
         self._render_awarded_blocks(
-            list(data.get("awarded_blocks", [])),
+            self._current_awarded_blocks,
             result_loaded=result_loaded,
         )
 
@@ -335,6 +346,23 @@ class SessionOverviewPanel(QGroupBox):
             container_layout.addWidget(details_widget)
             self.awarded_layout.insertWidget(self.awarded_layout.count() - 1, container)
 
+    def _copy_awarded_to_clipboard(self) -> None:
+        if not self._current_awarded_blocks:
+            QApplication.clipboard().setText("🏆 *Premiados*\n\nNenhum bloco premiado.")
+            return
+        lines = ["\U0001f3c6 *Premiados*"]
+        for block in self._current_awarded_blocks:
+            block_num = block.get("block_number", "???")
+            page_count = int(block.get("page_count", 0))
+            prize_count = int(block.get("prize_count", 0))
+            lines.append(f"\n*Bloco {block_num}* \u2022 {_page_label(page_count)} \u2022 {_prize_label(prize_count)}")
+            for detail in block.get("details", []):
+                bet_text = str(detail.get("bet_text", ""))
+                page_number = detail.get("page_number", "?")
+                line_number = detail.get("line_number", "?")
+                lines.append(f"  - {bet_text} (Pág. {page_number} \u2022 Linha {line_number})")
+        QApplication.clipboard().setText("\n".join(lines))
+
     def _block_row_text(self, block: dict[str, object]) -> str:
         parts = [
             f"Bloco {block['block_number']}",
@@ -358,3 +386,4 @@ class SessionOverviewPanel(QGroupBox):
         self.stack.setCurrentIndex(index)
         for button_index, button in enumerate(self.tab_buttons):
             button.setChecked(button_index == index)
+        self.copy_awarded_button.setVisible(index == 1)

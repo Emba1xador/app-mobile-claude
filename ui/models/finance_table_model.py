@@ -88,6 +88,8 @@ class FinanceTableModel(QAbstractTableModel):
                 case self.COL_BLOCK:
                     return row.block_number
                 case self.COL_RECEIVED:
+                    if getattr(row, "money_fiado", False):
+                        return "FIADO"
                     return "--" if row.money_received is None else format_money(row.money_received)
                 case self.COL_BRUTO:
                     return format_money(row.bruto)
@@ -107,6 +109,8 @@ class FinanceTableModel(QAbstractTableModel):
             if index.column() == self.COL_BLOCK:
                 return QBrush(color("title"))
             if index.column() == self.COL_RECEIVED:
+                if getattr(row, "money_fiado", False):
+                    return QBrush(color("warning_fg"))
                 token = "finance_received_missing_text" if row.money_received is None else "finance_received_text"
                 return QBrush(color(token))
             if index.column() == self.COL_SALDO and row.resultado is not None:
@@ -127,7 +131,8 @@ class FinanceTableModel(QAbstractTableModel):
                 return font
             if index.column() == self.COL_RECEIVED and row.money_received is None:
                 font.setPointSizeF(9.4)
-                font.setItalic(True)
+                font.setItalic(not getattr(row, "money_fiado", False))
+                font.setBold(getattr(row, "money_fiado", False))
                 return font
             if index.column() in {self.COL_BRUTO, self.COL_LIQUIDO}:
                 font.setPointSizeF(10.4)
@@ -153,7 +158,9 @@ class FinanceTableModel(QAbstractTableModel):
             if index.column() == self.COL_BLOCK:
                 return "Clique para abrir este bloco nos lan\u00e7amentos"
             if index.column() == self.COL_RECEIVED:
-                return "Informe aqui o dinheiro recebido deste bloco"
+                if getattr(row, "money_fiado", False):
+                    return "FIADO — clique para alterar o valor"
+                return "Clique duas vezes para editar · 'f' = FIADO"
             if index.column() == self.COL_LIQUIDO:
                 return "L\u00edquido da banca neste bloco (70%)"
             if index.column() == self.COL_SALDO:

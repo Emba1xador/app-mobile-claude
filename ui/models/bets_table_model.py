@@ -67,6 +67,10 @@ class BetsTableModel(QAbstractTableModel):
         self.expanded_block_ids.add(block_id)
         self.refresh()
 
+    def collapse_all_blocks(self) -> None:
+        self.expanded_block_ids.clear()
+        self.refresh()
+
     def refresh_external_values(self, line_ids: set[str], page_ids: set[str], block_ids: set[str] | None = None) -> None:
         block_ids = set(block_ids or ())
         for row_index, row in enumerate(self.rows):

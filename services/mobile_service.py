@@ -112,7 +112,7 @@ class MobileSessionService:
             block, page = self._find_visible_page(controller, page_id)
             controller.apply_value_to_pending_lines(page_id, value_text)
             payload = self._page_detail_payload(controller, block, page)
-        payload["message"] = "Pagina preenchida."
+        payload["message"] = "Página preenchida."
         return payload
 
     def _page_detail_payload(self, controller: BancaController, block: Block, page: Page) -> dict:
@@ -131,8 +131,7 @@ class MobileSessionService:
 
     def _require_controller(self) -> BancaController:
         if not self.active_session_store.exists():
-            raise NoActiveSessionError("Nenhuma sessao ativa encontrada. Abra ou crie uma sessao no desktop.")
-        self.active_session_store.load()
+            raise NoActiveSessionError("Nenhuma sessão ativa encontrada. Abra ou crie uma sessão no desktop.")
         return BancaController(self.root)
 
     def _updated_at_text(self) -> str | None:
@@ -142,7 +141,7 @@ class MobileSessionService:
         return updated_at.isoformat(timespec="seconds")
 
     def _session_name(self, controller: BancaController) -> str:
-        return controller.state.session_name.strip() or "Sessao ativa"
+        return controller.state.session_name.strip() or "Sessão ativa"
 
     def _published_blocks(self, blocks: list[Block]) -> tuple[list[Block], int]:
         if not blocks:
@@ -222,9 +221,9 @@ class MobileSessionService:
         lock_payload = self._page_lock_payload(block)
         warning = lock_payload["lock_message"]
         if warning is None and total_values == 0:
-            warning = "Pagina sem apostas validas para lancamento."
+            warning = "Página sem apostas válidas para lançamento."
         elif warning is None and invalid_lines:
-            warning = "Pagina com apostas invalidas. Revise a estrutura no desktop."
+            warning = "Página com apostas inválidas. Revise a estrutura no desktop."
         payload = {
             "page_id": page.page_id,
             "number": page.number,
@@ -318,8 +317,8 @@ class MobileSessionService:
             if block.block_id == block_id:
                 return block
         if any(block.block_id == block_id for block in controller.state.blocks):
-            raise MobileVisibilityError("Este bloco ainda esta em digitacao no desktop e nao foi publicado para o mobile.")
-        raise ValueError("Bloco nao encontrado.")
+            raise MobileVisibilityError("Este bloco ainda está em digitação no desktop e não foi publicado para o mobile.")
+        raise ValueError("Bloco não encontrado.")
 
     def _find_visible_page(self, controller: BancaController, page_id: str) -> tuple[Block, Page]:
         published_blocks, _ = self._published_blocks(controller.state.blocks)
@@ -331,9 +330,9 @@ class MobileSessionService:
             for page in block.pages:
                 if page.page_id == page_id:
                     raise MobileVisibilityError(
-                        "Esta pagina ainda esta em digitacao no desktop e nao foi publicada para o mobile."
+                        "Esta página ainda está em digitação no desktop e não foi publicada para o mobile."
                     )
-        raise ValueError("Pagina nao encontrada.")
+        raise ValueError("Página não encontrada.")
 
     def _find_visible_line(self, controller: BancaController, line_id: str) -> tuple[Block, Page, BetLine]:
         published_blocks, _ = self._published_blocks(controller.state.blocks)
@@ -347,7 +346,7 @@ class MobileSessionService:
                 for line in page.lines:
                     if line.line_id == line_id:
                         raise MobileVisibilityError(
-                            "Esta linha ainda pertence a um bloco em digitacao no desktop e nao esta visivel no mobile."
+                            "Esta linha ainda pertence a um bloco em digitação no desktop e não está visível no mobile."
                         )
         raise ValueError("Linha nao encontrada.")
 

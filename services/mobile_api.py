@@ -124,7 +124,8 @@ def _build_handler(root: Path, service: MobileSessionService):
             try:
                 target.relative_to(assets_root.resolve())
             except ValueError:
-                self._send_json(404, {"error": "Asset nao encontrado."})
+                LOGGER.warning("Tentativa de path traversal: %s", path)
+                self._send_json(404, {"error": "Asset não encontrado."})
                 return
             if not target.is_file():
                 self._send_json(404, {"error": "Asset nao encontrado."})
@@ -136,13 +137,16 @@ def _build_handler(root: Path, service: MobileSessionService):
             self._send_bytes(200, content_type, body)
 
         def _read_json_body(self) -> dict:
+            _MAX_BODY_SIZE = 64 * 1024  # 64 KB
             length = int(self.headers.get("Content-Length", "0"))
             if length <= 0:
                 return {}
+            if length > _MAX_BODY_SIZE:
+                raise ValueError(f"Payload muito grande (máximo {_MAX_BODY_SIZE} bytes).")
             raw_payload = self.rfile.read(length).decode("utf-8")
             payload = json.loads(raw_payload)
             if not isinstance(payload, dict):
-                raise ValueError("O corpo da requisicao precisa ser um objeto JSON.")
+                raise ValueError("O corpo da requisição precisa ser um objeto JSON.")
             return payload
 
         def _send_json(self, status_code: int, payload: dict) -> None:

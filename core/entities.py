@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import Any
 from uuid import uuid4
 
 from core.enums import BetType, Flag, RowType
@@ -55,10 +54,6 @@ class BetLine:
         return self.spec is not None and self.spec.is_error
 
     @property
-    def is_editable(self) -> bool:
-        return True
-
-    @property
     def is_valid_bet(self) -> bool:
         return self.spec is not None and self.spec.is_valid
 
@@ -82,6 +77,7 @@ class Block:
     money_received: Decimal | None = None
     whatsapp_phone: str | None = None
     money_locked: bool = False
+    money_fiado: bool = False  # "a prazo/fiado" — sem valor numérico mas marcado
 
 
 @dataclass(slots=True)
@@ -118,6 +114,7 @@ class FinanceRow:
     values_complete: bool
     money_locked: bool
     winner_count: int = 0
+    money_fiado: bool = False
 
 
 @dataclass(slots=True)
@@ -152,12 +149,3 @@ class ProjectionRow:
     block_pendency_count: int = 0
 
 
-@dataclass(slots=True)
-class SavePayload:
-    version: int
-    blocks: list[dict[str, Any]]
-    result: dict[str, Any] | None
-    percentage: str
-    session_notes: str
-    whatsapp_map: dict[str, str]
-    ui_state: dict[str, Any]

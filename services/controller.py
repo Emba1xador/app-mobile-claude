@@ -26,7 +26,7 @@ from core.result_engine import build_result_snapshot, evaluate_line
 from core.summary_engine import build_summary
 from core.validators import ensure_numeric
 from services.commands import SelectionContext
-from services.formatting import format_money, parse_money
+from services.formatting import format_money, format_percentage, parse_money
 from storage.active_session_store import ActiveSessionStore, ActiveSessionToken
 from storage.json_store import JsonStore
 from storage.whatsapp_store import WhatsAppStore
@@ -317,19 +317,42 @@ class BancaController:
         self._recompute()
         self.notify()
 
-    def set_percentage(self, value_text: str) -> None:
-        del value_text
-        self.state.percentage = FIXED_PERCENTAGE
+    def set_block_money(self, block_id: str, value_text: str, force_unlock: bool = False) -> None:
+        block = self._get_block(block_id)
+        text = value_text.strip()
+        if text.upper() in {"F", "FIADO"}:
+            if block.money_locked and not force_unlock:
+                self._guard_block_mutation(block, force_unlock)
+            block.money_fiado = True
+            block.money_received = None
+            block.money_locked = True
+            self._recompute()
+            self.notify()
+            return
+        new_value = parse_money(text)
+        if block.money_locked and block.money_received != new_value:
+            self._guard_block_mutation(block, force_unlock)
+        block.money_fiado = False
+        block.money_received = new_value
+        block.money_locked = new_value is not None
         self._recompute()
         self.notify()
 
-    def set_block_money(self, block_id: str, value_text: str, force_unlock: bool = False) -> None:
+    def rename_block(self, block_id: str, new_number: str) -> None:
+        normalized = new_number.strip().lstrip("0") or "0"
+        if not normalized.isdigit():
+            raise ValueError("Número do bloco inválido — use apenas dígitos.")
+        normalized = normalized.zfill(3)
         block = self._get_block(block_id)
-        new_value = parse_money(value_text)
-        if block.money_locked and block.money_received != new_value:
-            self._guard_block_mutation(block, force_unlock)
-        block.money_received = new_value
-        block.money_locked = new_value is not None
+        old_number = block.number
+        block.number = normalized
+        # Migrar contato WhatsApp se existia no mapa
+        if old_number in self.state.whatsapp_map:
+            phone = self.state.whatsapp_map.pop(old_number)
+            self.state.whatsapp_map[normalized] = phone
+            block.whatsapp_phone = phone
+        elif normalized in self.state.whatsapp_map:
+            block.whatsapp_phone = self.state.whatsapp_map[normalized]
         self._recompute()
         self.notify()
 
@@ -463,7 +486,7 @@ class BancaController:
             return None, None
         page = block.pages[0]
         self.state.ui_state.selected_page_id = page.page_id
-        line = next((item for item in page.lines if True), None)
+        line = page.lines[0] if page.lines else None
         self.state.ui_state.selected_line_id = line.line_id if line else None
         self.notify()
         return page.page_id, self.state.ui_state.selected_line_id
@@ -747,7 +770,7 @@ class BancaController:
         lines = [
             f"Bloco {row.block_number}",
             f"Bruto: {format_money(row.bruto)}",
-            f"Líquido (70%): {format_money(row.liquido)}",
+            f"Líquido ({format_percentage(FIXED_PERCENTAGE)}): {format_money(row.liquido)}",
             f"Dinheiro recebido: {format_money(row.money_received)}",
             f"Saldo: {format_money(row.resultado)}",
         ]
